@@ -1,0 +1,40 @@
+{
+    "Changes": [
+        {
+            "LogName": "Load FarmLink Terminal images",
+            "Action": "Load",
+            "Target": "Mods/{{ModID}}/FarmLinkTerminal",
+            "FromFile": "assets/FarmLinkTerminal.png"
+        },
+        {
+            "LogName": "BigCraftable",
+            "Action": "EditData",
+            "Target": "Data/BigCraftables",
+            "Entries": {
+                "{{ModID}}_FarmLinkTerminal": {
+                    "Name": "{{ModID}}_FarmLinkTerminal",
+                    "DisplayName": "{{i18n: FarmLinkTerminal_DisplayName}}",
+                    "Description": "{{i18n: FarmLinkTerminal_Description}}",
+                    "Price": 250000,
+                    "Fragility": 0,
+                    "CanBePlacedOutdoors": true,
+                    "CanBePlacedIndoors": true,
+                    "IsLamp": true,
+                    "Texture": "Mods/{{ModID}}/FarmLinkTerminal",
+                    "SpriteIndex": 0,
+                    "ContextTags": null,
+                    "CustomFields": null
+                }
+            }
+
+        },
+        {
+            "LogName": "CraftRecipes",
+            "Action": "EditData",
+            "Target": "Data/CraftingRecipes",
+            "Entries": {
+                "{{ModID}}_AutoSortChest": "388 1/Field/{{ModID}}_FarmLinkTerminal/true/Farming 0/{{i18n: FarmLinkTerminal_Recipe}}"
+            }
+        }
+    ]
+}
