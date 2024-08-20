@@ -1,12 +1,12 @@
-##ULTIMATE STORAGE SYSTEM - The Ultimate Solution for Your Inventory in Stardew Valley 1.6
+# ULTIMATE STORAGE SYSTEM - The Ultimate Solution for Your Inventory in Stardew Valley 1.6
 
-#Introduction
+## Introduction
 
 Welcome to the "ULTIMATE STORAGE SYSTEM" – your new way to effortlessly manage all your items in the game!
 This mod revolutionizes how you interact with your inventory, making storing and retrieving items easier and more efficient than ever before.
 
 
-#Key Features
+## Key Features
 
 Centralized Inventory: Access all your owned items from a single computer terminal.
 
@@ -29,7 +29,7 @@ Workbench Integration: Place a workbench directly next to the terminal to access
 Language Support: The mod supports all languages. While the column headers are fixed in English due to the GUI, all items, HUD notifications, terminal display at the vendor, and in the player inventory are displayed in the selected game language.
 
 
-#Installation
+## Installation
 
 Requirements: The mod requires SMAPI and ContentPatcher.
 
@@ -40,20 +40,20 @@ Manual: Extract the contents of the zip archive into the "Mods" folder of your g
 In-Game Access: Purchase the FarmLink Terminal from the Dwarf in the Mines. To unlock access, you must clear the path to the right of him (requires an upgraded pickaxe or bomb) and donate all Dwarvish Scrolls and the Dwarvish Gadget to the Museum.
 
 
-#Compatibility
+## Compatibility
 
 Version 1.0: The mod has not yet been tested for compatibility with other mods. Your feedback is greatly appreciated!
 
 Multiplayer: The mod has not been tested in multiplayer yet. Feedback on this is also welcome.
 
 
-#Future Updates
+## Future Updates
 
 I plan to release regular updates with bug fixes and new features. My first goal is to integrate an online shop into the terminal. I'm also open to other ideas and suggestions!
 Please understand if not everything is implemented immediately. I am very busy with both my personal and professional life, but I will do my best to continue improving the mod!
 
 
-#Frequently Asked Questions
+# Frequently Asked Questions
 
 Q: Is the mod compatible with XYZ mod?
 A: This hasn't been tested yet. Your feedback on this is very helpful!
