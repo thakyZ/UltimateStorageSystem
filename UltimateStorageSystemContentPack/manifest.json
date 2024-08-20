@@ -1,0 +1,13 @@
+﻿{
+    "Name": "UltimateStorageSystemContentPack",
+    "Author": "holybananabants",
+    "Version": "1.0.2",
+    "Description": "Adds FarmLink Terminal",
+    "UniqueID": "holybananapants.UltimateStorageSystemContentPack",
+    "MinimumApiVersion": "4.0",
+    "UpdateKeys": ["Nexus: 26919"],
+    "ContentPackFor": {
+        "UniqueID": "Pathoschild.ContentPatcher",
+        "MinimumVersion": "2.0.6"
+    }
+}
