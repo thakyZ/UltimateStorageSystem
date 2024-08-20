@@ -1,0 +1,8 @@
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\bin\Release\net6.0\UltimateStorageSystem.deps.json
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\bin\Release\net6.0\UltimateStorageSystem.dll
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\obj\Release\net6.0\UltimateStorageSystem.csproj.AssemblyReference.cache
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\obj\Release\net6.0\UltimateStorageSystem.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\obj\Release\net6.0\UltimateStorageSystem.AssemblyInfoInputs.cache
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\obj\Release\net6.0\UltimateStorageSystem.AssemblyInfo.cs
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\obj\Release\net6.0\UltimateStorageSystem.csproj.CoreCompileInputs.cache
+C:\Users\betti\OneDrive - Hochschule Bonn-Rhein-Sieg\- Projekte\Stardew Valley Mods\UltimateStorageSystem\UltimateStorageSystem\obj\Release\net6.0\UltimateStorageSystem.dll
