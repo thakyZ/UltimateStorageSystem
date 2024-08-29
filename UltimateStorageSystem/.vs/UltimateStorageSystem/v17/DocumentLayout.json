@@ -1,0 +1,196 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\tools\\itemtransfermanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\tools\\itemtransfermanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\drawing\\farmlinkterminalmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\drawing\\farmlinkterminalmenu.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\utilities\\itementry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\utilities\\itementry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\drawing\\itemtable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\drawing\\itemtable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\drawing\\scrollbar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\drawing\\scrollbar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\drawing\\workbenchtab.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\drawing\\workbenchtab.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\tools\\farmlinkterminal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\tools\\farmlinkterminal.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\drawing\\itemtablerenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\drawing\\itemtablerenderer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\modentry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\modentry.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|c:\\users\\betti\\desktop\\ultimatestoragesystem\\ultimatestoragesystem\\ultimatestoragesystem\\overrides\\customworkbench.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0FA52035-F0DF-4991-AEE8-24464BC9FA32}|UltimateStorageSystem\\UltimateStorageSystem.csproj|solutionrelative:ultimatestoragesystem\\overrides\\customworkbench.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\betti\\OneDrive - Hochschule Bonn-Rhein-Sieg\\- Projekte\\Stardew Valley Mods\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\CraftingTable.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ItemEntry.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Utilities\\ItemEntry.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Utilities\\ItemEntry.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Utilities\\ItemEntry.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Utilities\\ItemEntry.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB4AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T20:48:07.434Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Scrollbar.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\Scrollbar.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Drawing\\Scrollbar.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\Scrollbar.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Drawing\\Scrollbar.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAHIAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T19:41:06.593Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "CraftingTable.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\OneDrive - Hochschule Bonn-Rhein-Sieg\\- Projekte\\Stardew Valley Mods\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\CraftingTable.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\OneDrive - Hochschule Bonn-Rhein-Sieg\\- Projekte\\Stardew Valley Mods\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\CraftingTable.cs",
+              "ToolTip": "C:\\Users\\betti\\OneDrive - Hochschule Bonn-Rhein-Sieg\\- Projekte\\Stardew Valley Mods\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\CraftingTable.cs",
+              "RelativeToolTip": "..\\..\\..\\OneDrive - Hochschule Bonn-Rhein-Sieg\\- Projekte\\Stardew Valley Mods\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\CraftingTable.cs",
+              "ViewState": "AQIAABwAAAAAAAAAAAAcwCsAAACEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T19:01:32.828Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FarmLinkTerminalMenu.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\FarmLinkTerminalMenu.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Drawing\\FarmLinkTerminalMenu.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\FarmLinkTerminalMenu.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Drawing\\FarmLinkTerminalMenu.cs",
+              "ViewState": "AQIAAKYAAAAAAAAAAAAAAMoAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T18:05:39.064Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ItemTransferManager.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Tools\\ItemTransferManager.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Tools\\ItemTransferManager.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Tools\\ItemTransferManager.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Tools\\ItemTransferManager.cs",
+              "ViewState": "AQIAAKUAAAAAAAAAAAAswMEAAAB9AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T17:32:53.482Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ItemTable.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\ItemTable.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Drawing\\ItemTable.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\ItemTable.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Drawing\\ItemTable.cs",
+              "ViewState": "AQIAAIAAAAAAAAAAAAAmwLYAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T06:24:03.404Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "WorkbenchTab.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\WorkbenchTab.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Drawing\\WorkbenchTab.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\WorkbenchTab.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Drawing\\WorkbenchTab.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAAuwD0AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T17:56:53.07Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ItemTableRenderer.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\ItemTableRenderer.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Drawing\\ItemTableRenderer.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Drawing\\ItemTableRenderer.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Drawing\\ItemTableRenderer.cs",
+              "ViewState": "AQIAAMoAAAAAAAAAAAAkwCsAAAApAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T06:24:48.937Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "FarmLinkTerminal.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Tools\\FarmLinkTerminal.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Tools\\FarmLinkTerminal.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Tools\\FarmLinkTerminal.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Tools\\FarmLinkTerminal.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAeAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T06:23:55.651Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ModEntry.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\ModEntry.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\ModEntry.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\ModEntry.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\ModEntry.cs",
+              "ViewState": "AQIAALMAAAAAAAAAAAAUwLcAAABOAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-22T20:20:57.819Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CustomWorkbench.cs",
+              "DocumentMoniker": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Overrides\\CustomWorkbench.cs",
+              "RelativeDocumentMoniker": "UltimateStorageSystem\\Overrides\\CustomWorkbench.cs",
+              "ToolTip": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\Overrides\\CustomWorkbench.cs",
+              "RelativeToolTip": "UltimateStorageSystem\\Overrides\\CustomWorkbench.cs",
+              "ViewState": "AQIAAFcAAAAAAAAAAAAAAIMAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-23T06:22:02.593Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
