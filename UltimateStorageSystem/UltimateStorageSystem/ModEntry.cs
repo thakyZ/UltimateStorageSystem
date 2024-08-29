@@ -47,7 +47,7 @@ namespace UltimateStorageSystem
             helper.Events.Player.Warped += OnLocationChanged;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.Saving += OnSaving;
-            helper.Events.GameLoop.Saved += OnSaved;
+            helper.Events.GameLoop.Saved += OnSaved;            
         }
 
         private void LoadConfig()

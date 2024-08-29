@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj": {}
+    "C:\\Users\\betti\\OneDrive\\_Projekte\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj": {
+    "C:\\Users\\betti\\OneDrive\\_Projekte\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj",
+        "projectUniqueName": "C:\\Users\\betti\\OneDrive\\_Projekte\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj",
         "projectName": "UltimateStorageSystem",
-        "projectPath": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj",
+        "projectPath": "C:\\Users\\betti\\OneDrive\\_Projekte\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem.csproj",
         "packagesPath": "C:\\Users\\betti\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\betti\\Desktop\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\obj\\",
+        "outputPath": "C:\\Users\\betti\\OneDrive\\_Projekte\\UltimateStorageSystem\\UltimateStorageSystem\\UltimateStorageSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
