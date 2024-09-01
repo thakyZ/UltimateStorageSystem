@@ -43,18 +43,20 @@ namespace UltimateStorageSystem.Tools
                     {
                         string key = $"{item.DisplayName}_{item.Category}_{item.Quality}_{item.ParentSheetIndex}";
 
+                        int itemPrice = item.sellToStorePrice(-1L); // Verkaufspreis entsprechend dem Vanilla-Inventar
+
                         if (groupedItems.ContainsKey(key))
                         {
                             groupedItems[key].Quantity += item.Stack;
-                            groupedItems[key].TotalValue += Math.Max(0, item.salePrice()) * item.Stack;
+                            groupedItems[key].TotalValue += Math.Max(0, itemPrice) * item.Stack;
                         }
                         else
                         {
                             groupedItems[key] = new ItemEntry(
                                 item.DisplayName,
                                 item.Stack,
-                                Math.Max(0, item.salePrice()),
-                                Math.Max(0, item.salePrice()) * item.Stack,
+                                Math.Max(0, itemPrice),
+                                Math.Max(0, itemPrice) * item.Stack,
                                 item
                             );
                         }
@@ -72,6 +74,7 @@ namespace UltimateStorageSystem.Tools
 
             itemTable.Refresh();
         }
+
 
         // Methode zum Sammeln aller Gegenstände eines Typs aus den Truhen
         private List<Item> CollectItemsFromChests(Item item, int amount)
@@ -214,23 +217,19 @@ namespace UltimateStorageSystem.Tools
         {
             int amountToTransfer;
 
-            if (item is Furniture furniture)
+            if (item is Furniture || item is Ring || item is MeleeWeapon || item is Tool || item is Boots)
             {
                 if (!isInInventory)
                 {
-                    // Suche die Truhe, die das Möbelstück enthält
-                    Chest sourceChest = chests.FirstOrDefault(chest => chest.Items.Contains(furniture));
+                    // Suche die Truhe, die den Ausrüstungsgegenstand enthält
+                    Chest sourceChest = chests.FirstOrDefault(chest => chest.Items.Contains(item));
                     if (sourceChest != null)
                     {
-                        // Temporäres Verschieben des Möbelstücks aus der Truhe
-                        Vector2 tempPosition = new Vector2(-1000, -1000);
-                        sourceChest.Items.Remove(furniture);
+                        // Temporäres Verschieben des Gegenstands aus der Truhe
+                        sourceChest.Items.Remove(item);
 
-                        // Setze die Position, um es aus der Truhe zu entfernen
-                        furniture.TileLocation = tempPosition;
-
-                        // Übertrage das Möbelstück ins Inventar des Spielers
-                        Game1.player.addItemToInventory(furniture);
+                        // Übertrage den Gegenstand ins Inventar des Spielers
+                        Game1.player.addItemToInventory(item);
                     }
                 }
                 else
@@ -241,24 +240,27 @@ namespace UltimateStorageSystem.Tools
             }
             else
             {
-                var entry = itemTable.GetItemEntries().FirstOrDefault(e => e.Item == item);
-                if (entry != null)
-                {
-                    int maxStackSize = item.maximumStackSize();
-                    int stackSize = shiftPressed ? maxStackSize / 2 : maxStackSize;
-                    amountToTransfer = Math.Min(entry.Quantity, stackSize);
-                }
-                else
-                {
-                    amountToTransfer = shiftPressed ? item.Stack / 2 : item.Stack;
-                }
-
                 if (isInInventory)
                 {
+                    // Bei Shift-Klick: Übertrage die Hälfte des Stacks ins Terminal
+                    amountToTransfer = shiftPressed ? Math.Max(1, item.Stack / 2) : item.Stack;
                     TransferFromInventoryToChests(item, amountToTransfer);
                 }
                 else
                 {
+                    // Hier ist der Code für den Linksklick mit Umschalttaste zu prüfen
+                    var entry = itemTable.GetItemEntries().FirstOrDefault(e => e.Item == item);
+                    if (entry != null)
+                    {
+                        int maxStackSize = item.maximumStackSize();
+                        int stackSize = Math.Min(maxStackSize / 2, entry.Quantity / 2); // Maximale Größe ist ein halbes Stack oder die Hälfte der verfügbaren Menge
+                        amountToTransfer = shiftPressed ? stackSize : Math.Min(entry.Quantity, maxStackSize - 1);
+                    }
+                    else
+                    {
+                        amountToTransfer = shiftPressed ? Math.Max(1, item.Stack / 2) : item.Stack;
+                    }
+
                     TransferFromChestsToInventory(item, amountToTransfer);
                 }
             }
@@ -279,17 +281,15 @@ namespace UltimateStorageSystem.Tools
                 amountToTransfer = Math.Min(amountToTransfer, Math.Min(entry.Quantity, maxStackSize - 1));
             }
 
-            if (item is Furniture furniture)
+            if (item is Furniture || item is Ring || item is MeleeWeapon || item is Tool || item is Boots)
             {
                 if (!isInInventory)
                 {
-                    Chest sourceChest = chests.FirstOrDefault(chest => chest.Items.Contains(furniture));
+                    Chest sourceChest = chests.FirstOrDefault(chest => chest.Items.Contains(item));
                     if (sourceChest != null)
                     {
-                        Vector2 tempPosition = new Vector2(-1000, -1000);
-                        sourceChest.Items.Remove(furniture);
-                        furniture.TileLocation = tempPosition;
-                        Game1.player.addItemToInventory(furniture);
+                        sourceChest.Items.Remove(item);
+                        Game1.player.addItemToInventory(item);
                     }
                 }
                 else

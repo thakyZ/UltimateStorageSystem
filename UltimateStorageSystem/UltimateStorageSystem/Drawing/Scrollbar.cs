@@ -5,6 +5,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using UltimateStorageSystem.Interfaces; // Import the interface
 
 #nullable disable
 
@@ -16,12 +17,12 @@ namespace UltimateStorageSystem.Drawing
         private readonly Rectangle scrollBarRunner;  // The area within which the scrollbar can move
         private Rectangle scrollBar;  // The actual scrollbar slider
         private bool isScrolling = false;  // Flag to indicate if scrolling is in progress
-        private readonly ItemTable itemTable;  // Reference to the table being scrolled
+        private readonly IScrollableTable table;  // Reference to the table being scrolled
 
         // Constructor, initializes the scrollbar with position and associated table
-        public Scrollbar(int x, int y, ItemTable itemTable)
+        public Scrollbar(int x, int y, IScrollableTable table)
         {
-            this.itemTable = itemTable;
+            this.table = table;
             scrollBarRunner = new Rectangle(x - 5, y + 40, 20, 400);  // Offset the scrollbar 40px down and 5px to the left
             scrollBar = new Rectangle(scrollBarRunner.X, scrollBarRunner.Y, 20, 20);
         }
@@ -65,17 +66,17 @@ namespace UltimateStorageSystem.Drawing
         public void ReceiveScrollWheelAction(int direction)
         {
             int scrollAmount = direction > 0 ? -1 : 1; // Scroll up or down
-            int itemCount = itemTable.GetItemEntries().Count;
-            int visibleRows = ItemTable.GetVisibleRows();
-            itemTable.ScrollIndex = Math.Clamp(itemTable.ScrollIndex + scrollAmount, 0, Math.Max(0, itemCount - visibleRows));
+            int itemCount = table.GetItemEntriesCount();
+            int visibleRows = table.GetVisibleRows();
+            table.ScrollIndex = Math.Clamp(table.ScrollIndex + scrollAmount, 0, Math.Max(0, itemCount - visibleRows));
             UpdateScrollBarPosition();
         }
 
         // Updates the scrollbar position based on the current scroll index of the table
         public void UpdateScrollBarPosition()
         {
-            int itemCount = itemTable.GetItemEntries().Count;
-            int visibleRows = ItemTable.GetVisibleRows();
+            int itemCount = table.GetItemEntriesCount();
+            int visibleRows = table.GetVisibleRows();
 
             if (itemCount > visibleRows)
             {
@@ -86,7 +87,7 @@ namespace UltimateStorageSystem.Drawing
                 scrollBar.Height = (int)(scrollBarRunner.Height * proportionVisible);
 
                 // Calculate where the slider should be positioned
-                float percent = itemTable.ScrollIndex / (float)(itemCount - visibleRows);
+                float percent = table.ScrollIndex / (float)(itemCount - visibleRows);
                 scrollBar.Y = scrollBarRunner.Y + (int)(percent * (scrollBarRunner.Height - scrollBar.Height));
             }
             else
@@ -100,10 +101,10 @@ namespace UltimateStorageSystem.Drawing
         private void UpdateScrollBar(int y)
         {
             float percent = (y - scrollBarRunner.Y) / (float)(scrollBarRunner.Height - scrollBar.Height);
-            int itemCount = itemTable.GetItemEntries().Count;
-            int visibleRows = ItemTable.GetVisibleRows();
-            itemTable.ScrollIndex = (int)(percent * Math.Max(0, itemCount - visibleRows));
-            itemTable.ScrollIndex = Math.Clamp(itemTable.ScrollIndex, 0, Math.Max(0, itemCount - visibleRows));
+            int itemCount = table.GetItemEntriesCount();
+            int visibleRows = table.GetVisibleRows();
+            table.ScrollIndex = (int)(percent * Math.Max(0, itemCount - visibleRows));
+            table.ScrollIndex = Math.Clamp(table.ScrollIndex, 0, Math.Max(0, itemCount - visibleRows));
             UpdateScrollBarPosition();
         }
     }

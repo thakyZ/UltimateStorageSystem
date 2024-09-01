@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("UltimateStorageSystem")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b9d3cc3a7743e8c734805b5ece919556881ab65")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9acc50cd768b29743d271afff9383e5723a2a15b")]
 [assembly: System.Reflection.AssemblyProductAttribute("UltimateStorageSystem")]
 [assembly: System.Reflection.AssemblyTitleAttribute("UltimateStorageSystem")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

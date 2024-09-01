@@ -8,12 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using UltimateStorageSystem.Utilities;
+using UltimateStorageSystem.Interfaces; // Import the interface
 
 #nullable disable
 
 namespace UltimateStorageSystem.Drawing
 {
-    public class ItemTable
+    public class ItemTable : IFilterableTable, IScrollableTable // Implementing both interfaces
     {
         // Starting position of the table
         public int StartX { get; }
@@ -52,9 +53,15 @@ namespace UltimateStorageSystem.Drawing
         }
 
         // Returns the number of visible rows in the table
-        public static int GetVisibleRows()
+        public int GetVisibleRows()
         {
             return 13; // Example: 13 visible rows
+        }
+
+        // Returns the number of item entries in the table
+        public int GetItemEntriesCount()
+        {
+            return filteredItems.Count;
         }
 
         // Draws the table and its contents
