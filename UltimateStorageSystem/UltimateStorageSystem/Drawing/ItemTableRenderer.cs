@@ -276,7 +276,7 @@ namespace UltimateStorageSystem.Drawing
             hoverRowIndex = -1;
 
             // Update hoverRowIndex based on the current mouse position
-            for (int i = 0; i < ItemTable.GetVisibleRows(); i++)
+            for (int i = 0; i < table.GetVisibleRows(); i++)
             {
                 int index = table.ScrollIndex + i;
                 if (index >= table.GetItemEntries().Count)

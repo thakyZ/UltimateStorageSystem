@@ -30,7 +30,7 @@ namespace UltimateStorageSystem
         private ModConfig config;
         private SButton? openTerminalHotkey;  // Nullable SButton für den Hotkey
         private readonly string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
-        private bool justOpenedMenu = false;
+        public bool ignoreNextRightClick = true;
 
         public override void Entry(IModHelper helper)
         {
@@ -47,7 +47,7 @@ namespace UltimateStorageSystem
             helper.Events.Player.Warped += OnLocationChanged;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.GameLoop.Saving += OnSaving;
-            helper.Events.GameLoop.Saved += OnSaved;            
+            helper.Events.GameLoop.Saved += OnSaved;
         }
 
         private void LoadConfig()
@@ -102,15 +102,10 @@ namespace UltimateStorageSystem
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            if (justOpenedMenu)
-            {
-                justOpenedMenu = false;
-                return;
-            }
-
             // Prüfen, ob der Hotkey definiert ist und gedrückt wurde
             if (openTerminalHotkey.HasValue && Context.IsPlayerFree && e.Button == openTerminalHotkey)
             {
+                ignoreNextRightClick = false;
                 if (IsFarmLinkTerminalPlaced())
                 {
                     OpenFarmLinkTerminalMenu();
@@ -124,8 +119,8 @@ namespace UltimateStorageSystem
                 {
                     if (FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
                     {
+                        ignoreNextRightClick = true;
                         OpenFarmLinkTerminalMenu();
-                        justOpenedMenu = true;
                     }
                 }
             }
@@ -268,7 +263,7 @@ namespace UltimateStorageSystem
                 // Kühlschrank im Farmhaus prüfen
                 if (location is FarmHouse)
                 {
-                    Chest fridge = (location as FarmHouse).fridge.Value;
+                    Chest fridge = (location as FarmHouse).fridge.Value;                    
                     if (fridge != null)
                     {
                         chests.Add(fridge);

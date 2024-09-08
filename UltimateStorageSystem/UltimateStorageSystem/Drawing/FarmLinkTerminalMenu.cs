@@ -31,9 +31,6 @@ namespace UltimateStorageSystem.Drawing
         private List<ClickableTextureComponent> tabs; // Liste der Reiter
         private int selectedTab; // Der aktuell ausgewählte Reiter
 
-        // Flag to ignore the first right-click after opening the menu.
-        private bool ignoreNextRightClick = true;
-
         // Constructor for the menu, initializes the GUI components.
         public FarmLinkTerminalMenu(List<Chest> chests) : base(Game1.viewport.Width / 2 - 400, Game1.viewport.Height / 2 - 500, 800, 1000)
         {
@@ -245,7 +242,6 @@ namespace UltimateStorageSystem.Drawing
             this.drawMouse(b);
         }
 
-
         // Processes left-clicks on the menu.
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
@@ -289,9 +285,9 @@ namespace UltimateStorageSystem.Drawing
         // Processes right-clicks on the menu.
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
-            if (ignoreNextRightClick)
+            if (ModEntry.Instance.ignoreNextRightClick)
             {
-                ignoreNextRightClick = false;
+                ModEntry.Instance.ignoreNextRightClick = false;
                 return;
             }
 
@@ -323,7 +319,7 @@ namespace UltimateStorageSystem.Drawing
                 }
             }
 
-            for (int i = 0; i < ItemTable.GetVisibleRows(); i++)
+            for (int i = 0; i < itemTable.GetVisibleRows(); i++)
             {
                 int index = itemTable.ScrollIndex + i;
                 if (index >= itemTable.GetItemEntries().Count)

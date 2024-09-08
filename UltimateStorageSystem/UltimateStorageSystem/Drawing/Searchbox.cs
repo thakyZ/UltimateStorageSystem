@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
+using UltimateStorageSystem.Interfaces; // Import the interface
 
 #nullable disable
 
@@ -15,16 +16,16 @@ namespace UltimateStorageSystem.Drawing
     {
         // Properties of the search box
         public TextBox textBox { get; private set; } // The actual textbox for input
-        private readonly ItemTable itemTable; // Reference to the table being filtered
+        private readonly IFilterableTable table; // Reference to the table being filtered
         private readonly Scrollbar scrollbar; // Reference to the scrollbar
         private readonly Texture2D whiteTexture; // Simple white texture for drawing the background
         public readonly char nonBreakingSpace = '\u00A0'; // Non-breaking space to prevent empty search queries
         private string previousText; // Variable to store the previous text
 
         // Constructor, initializes the search box with position and associated table
-        public SearchBox(int x, int y, ItemTable itemTable, Scrollbar scrollbar)
+        public SearchBox(int x, int y, IFilterableTable table, Scrollbar scrollbar)
         {
-            this.itemTable = itemTable;
+            this.table = table;
             this.scrollbar = scrollbar;
 
             // Initializes the textbox with a specific position and size
@@ -51,14 +52,14 @@ namespace UltimateStorageSystem.Drawing
         {
             // Updates the filter based on the search text
             string searchText = sender.Text.TrimStart(nonBreakingSpace);
-            itemTable.FilterItems(searchText);
-            itemTable.ScrollIndex = 0; // Scrolls the view to the top after the search is applied.
+            table.FilterItems(searchText);
+            table.ScrollIndex = 0; // Scrolls the view to the top after the search is applied.
 
             // Also reset the scrollbar to the beginning
             scrollbar.UpdateScrollBarPosition();
 
             // Apply the current sorting after filtering
-            itemTable.SortItemsBy(ItemTableRenderer.GetSortedColumn(), ItemTableRenderer.IsSortAscending());
+            table.SortItemsBy(ItemTableRenderer.GetSortedColumn(), ItemTableRenderer.IsSortAscending());
         }
 
         // Draws the search box on the screen
@@ -125,14 +126,14 @@ namespace UltimateStorageSystem.Drawing
             {
                 previousText = textBox.Text;
                 string searchText = textBox.Text.TrimStart(nonBreakingSpace);
-                itemTable.FilterItems(searchText);
-                itemTable.ScrollIndex = 0; // Scrolls the view to the top after the search is applied.
+                table.FilterItems(searchText);
+                table.ScrollIndex = 0; // Scrolls the view to the top after the search is applied.
 
                 // Also reset the scrollbar to the beginning
                 scrollbar.UpdateScrollBarPosition();
 
                 // Apply the current sorting after filtering
-                itemTable.SortItemsBy(ItemTableRenderer.GetSortedColumn(), ItemTableRenderer.IsSortAscending());
+                table.SortItemsBy(ItemTableRenderer.GetSortedColumn(), ItemTableRenderer.IsSortAscending());
             }
 
             textBox.Update();
