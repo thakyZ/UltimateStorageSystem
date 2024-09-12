@@ -11,6 +11,6 @@
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
   </ItemGroup>
 
-  <Import Project="$(SolutionDir)..\..\common.targets" />
+  <Import Project="$(SolutionDir)common.targets" />
 
 </Project>
