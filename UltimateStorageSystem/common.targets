@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <SonarQubeExclude>True</SonarQubeExclude>
+    <ModZipPath>$(SolutionDir)\..\_releases</ModZipPath>
   </PropertyGroup>
 
   <ItemGroup>
