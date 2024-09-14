@@ -1,82 +1,196 @@
-﻿using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Locations;
-using StardewModdingAPI.Events;
-using StardewValley;
-using Microsoft.Xna.Framework;
 using StardewValley.Objects;
-using System.Collections.Generic;
+using StardewModdingAPI.Events;
 using UltimateStorageSystem.Drawing;
+using UltimateStorageSystem.Integrations.GenericModConfigMenu;
 using UltimateStorageSystem.Tools;
 using UltimateStorageSystem.Overrides;
-using System.Linq;
-using System.IO;
-using System.Xml.Serialization;
-using Microsoft.Xna.Framework.Graphics;
-
-#nullable disable
+using UltimateStorageSystem.Integrations.SpaceCore;
 
 namespace UltimateStorageSystem
 {
-    [XmlInclude(typeof(CustomWorkbench))]
-    public class ModConfig
-    {
-        public string OpenFarmLinkTerminalHotkey { get; set; } = "";  // Standardwert ist ein leerer String
-    }
-
     public class ModEntry : Mod
     {
-        public static ModEntry Instance;
-        public static Texture2D basketTexture;
-        private ModConfig config;
-        private SButton? openTerminalHotkey;  // Nullable SButton für den Hotkey
-        private readonly string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
-        public bool ignoreNextRightClick = true;
+        /// <summary>Instance of the Mod for static methods.</summary>
+        internal static ModEntry Instance { get; private set; } = null!;
+
+        /// <summary>Adjacent tile offsets to the terminal to check.</summary>
+        internal static Vector2[] AdjacentTilesOffsets =>
+        [
+            new Vector2(-1f, 1f),
+            new Vector2(0f,  1f),
+            new Vector2(1f,  1f),
+            new Vector2(-1f, 0f),
+            new Vector2(1f,  0f),
+            new Vector2(-1f, -1f),
+            new Vector2(0f,  -1f),
+            new Vector2(1f,  -1f)
+        ];
+
+        /// <summary>Farmlink Terminal Data for blacklisting chests from the Farmlink Terminal.</summary>
+        internal FarmLinkTerminalData? FarmLinkTerminalData => _farmLinkTerminalData;
+        private  FarmLinkTerminalData? _farmLinkTerminalData;
+
+        /// <summary>The key for the Farmlink Terminal Save Data.</summary>
+        private const string FarmLinkTerminalDataKey = "farmlink-terminal-data";
+
+        /// <summary>
+        /// The button to open the farmlink terminal wirelessly.
+        /// <remarks>
+        /// TODO: Maybe make it locked behind an upgrade.
+        /// </remarks>
+        /// <remarks>Nullable SButton für den Hotkey</remarks>
+        /// </summary>
+        private SButton? OpenTerminalHotkey => config?.OpenFarmLinkTerminalHotkey ?? SButton.None;
+
+        /// <summary>The threshold for recusive methods before throwing an error.</summary>
+        const int RecurseThreshold = 5;
+
+        /// <summary>The custom basket texture.</summary>
+        internal static Texture2D BasketTexture => _basketTexture ??= Instance.Helper.ModContent.Load<Texture2D>("Assets/basket.png");
+        private  static Texture2D? _basketTexture;
+
+        /// <summary>The instance of the mod config.</summary>
+        private ModConfig config = null!;
+
+        /// <summary>The instance of the mod logger class.</summary>
+        private Logger _logger = null!;
+
+        /// <summary>The name of the farm link terminal object.</summary>
+        private const string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
+
+        /// <summary>Determines if the next mouse/controller right click is ignored.</summary>
+        internal bool IgnoreNextRightClick { get; set; } = true;
+
+        public ModEntry()
+        {
+            Instance = this;
+        }
 
         public override void Entry(IModHelper helper)
         {
-            Instance = this;
+            I18n.Init(helper.Translation);
+            ModXmlTypeConstructorAttribute.Init(this.ModManifest);
+            this._logger = new(this.Monitor);
+            this.config  = helper.ReadConfig<ModConfig>();
 
-            // Initiales Laden der Konfiguration aus der config.json
-            LoadConfig();
+            // // Initiales Laden der Konfiguration aus der config.json
+            // LoadConfig();
 
-            // Laden der Texturen aus dem Assets Ordner            
-            basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
+            // Laden der Texturen aus dem Assets Ordner
+            _basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
 
-            helper.Events.Input.ButtonPressed += OnButtonPressed;
+            helper.Events.Input.ButtonPressed     += OnButtonPressed;
             helper.Events.World.ObjectListChanged += OnObjectListChanged;
-            helper.Events.Player.Warped += OnLocationChanged;
-            helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            helper.Events.GameLoop.Saving += OnSaving;
-            helper.Events.GameLoop.Saved += OnSaved;
+            helper.Events.Player.Warped           += OnLocationChanged;
+            helper.Events.GameLoop.GameLaunched   += OnGameLaunched;
+            helper.Events.GameLoop.DayStarted     += OnDayStarted;
+            helper.Events.GameLoop.SaveLoaded     += OnSaveLoaded;
+            helper.Events.GameLoop.Saving         += OnSaving;
+            helper.Events.GameLoop.Saved          += OnSaved;
         }
 
-        private void LoadConfig()
+        //private void LoadConfig()
+        //{
+        //    try
+        //    {
+        //        config = Helper.ReadConfig<ModConfig>();
+        //
+        //        // Versuche, den Hotkey zu parsen
+        //        if (string.IsNullOrWhiteSpace(config.OpenFarmLinkTerminalHotkey) ||
+        //            !Enum.TryParse(config.OpenFarmLinkTerminalHotkey.ToUpper(), true, out SButton parsedHotkey))
+        //        {
+        //            openTerminalHotkey = null;
+        //
+        //            // Hinweis anzeigen, wenn kein Hotkey gesetzt ist
+        //            Monitor.Log("No hotkey is set for opening the FarmLink Terminal. You can set a hotkey in the config.json file located in the mod folder if desired.", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            openTerminalHotkey = parsedHotkey;
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        openTerminalHotkey = null;  // Falls ein Fehler auftritt, setzen Sie den Hotkey auf null
+        //    }
+        //}
+
+        private void InitFarmLinkTerminalData(int recurseStep = 0)
         {
-            try
+            if (recurseStep >= RecurseThreshold)
             {
-                config = Helper.ReadConfig<ModConfig>();
-
-                // Versuche, den Hotkey zu parsen
-                if (string.IsNullOrWhiteSpace(config.OpenFarmLinkTerminalHotkey) ||
-                    !Enum.TryParse(config.OpenFarmLinkTerminalHotkey.ToUpper(), true, out SButton parsedHotkey))
-                {
-                    openTerminalHotkey = null;
-
-                    // Hinweis anzeigen, wenn kein Hotkey gesetzt ist
-                    Monitor.Log("No hotkey is set for opening the FarmLink Terminal. You can set a hotkey in the config.json file located in the mod folder if desired.", LogLevel.Info);
-                }
-                else
-                {
-                    openTerminalHotkey = parsedHotkey;
-                }
+                RecurseMethodException.RecursedTooManySteps(recurseStep, RecurseThreshold);
             }
-            catch
+
+            if (Context.IsMainPlayer)
             {
-                openTerminalHotkey = null;  // Falls ein Fehler auftritt, setzen Sie den Hotkey auf null
+                Instance.Helper.Data.WriteSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey, new());
+                LoadFarmLinkTerminalData();
+            }
+            else
+            {
+                Logger.Warn("Tried to Initialize the FarmLink Terminal Data, via a remote client, ignoring.");
             }
         }
 
-        private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
+        internal void SaveFarmLinkTerminalData(FarmLinkTerminalData? data)
+        {
+            Instance.Helper.Data.WriteSaveData(FarmLinkTerminalDataKey, data);
+        }
+
+        private FarmLinkTerminalData? LoadFarmLinkTerminalDataImpl()
+        {
+            if (Context.IsMainPlayer)
+            {
+                return Instance.Helper.Data.ReadSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey);
+            }
+            else
+            {
+                Logger.Warn("Tried to load the FarmLink Terminal Data, via a remote client, ignoring.");
+            }
+
+            return null;
+        }
+
+        internal void LoadFarmLinkTerminalData(int recurseStep = 1)
+        {
+            if (Context.IsMainPlayer)
+            {
+                _farmLinkTerminalData = LoadFarmLinkTerminalDataImpl();
+                if (_farmLinkTerminalData is null)
+                {
+                    Logger.Error("Failed to load the FarmLink Terminal Data, will create a new one.");
+                    InitFarmLinkTerminalData(recurseStep > 1 ? recurseStep + 1 : 1);
+                }
+            }
+            else
+            {
+                Logger.Warn("Tried to load the FarmLink Terminal Data, via a remote client, ignoring.");
+            }
+        }
+
+        private void OnDayStarted(object? sender, DayStartedEventArgs e)
+        {
+            LoadFarmLinkTerminalData();
+        }
+
+        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
+        {
+            GenericModConfigMenuIntegration.Register(
+                manifest: this.ModManifest,
+                modRegistry: this.Helper.ModRegistry,
+                monitor: this._logger,
+                getConfig: () => this.config,
+                reset: () => config = new(),
+                save: () => this.Helper.WriteConfig(this.config),
+                titleScreenOnly: false);
+            SpaceCoreIntegration.Init(this.Helper.ModRegistry, this.Monitor);
+            SpaceCoreIntegration.RegisterSerializerTypes();
+        }
+
+        private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
             foreach (var location in Game1.locations)
             {
@@ -84,7 +198,7 @@ namespace UltimateStorageSystem
             }
         }
 
-        private void OnSaving(object sender, SavingEventArgs e)
+        private void OnSaving(object? sender, SavingEventArgs e)
         {
             foreach (var location in Game1.locations)
             {
@@ -92,7 +206,7 @@ namespace UltimateStorageSystem
             }
         }
 
-        private void OnSaved(object sender, SavedEventArgs e)
+        private void OnSaved(object? sender, SavedEventArgs e)
         {
             foreach (var location in Game1.locations)
             {
@@ -100,12 +214,12 @@ namespace UltimateStorageSystem
             }
         }
 
-        private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
+        private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
         {
             // Prüfen, ob der Hotkey definiert ist und gedrückt wurde
-            if (openTerminalHotkey.HasValue && Context.IsPlayerFree && e.Button == openTerminalHotkey)
+            if (OpenTerminalHotkey.HasValue && Context.IsPlayerFree && e.Button == OpenTerminalHotkey)
             {
-                ignoreNextRightClick = false;
+                IgnoreNextRightClick = false;
                 if (IsFarmLinkTerminalPlaced())
                 {
                     OpenFarmLinkTerminalMenu();
@@ -119,19 +233,19 @@ namespace UltimateStorageSystem
                 {
                     if (FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
                     {
-                        ignoreNextRightClick = true;
+                        IgnoreNextRightClick = true;
                         OpenFarmLinkTerminalMenu();
                     }
                 }
             }
         }
 
-        private void OnLocationChanged(object sender, WarpedEventArgs e)
+        private void OnLocationChanged(object? sender, WarpedEventArgs e)
         {
             CheckForFarmLinkTerminal(e.NewLocation);
         }
 
-        private void OnObjectListChanged(object sender, ObjectListChangedEventArgs e)
+        private void OnObjectListChanged(object? sender, ObjectListChangedEventArgs e)
         {
             if (e.Removed.Any(obj => obj.Value.Name == farmLinkTerminalName))
             {
@@ -160,11 +274,11 @@ namespace UltimateStorageSystem
 
         private void CheckForFarmLinkTerminal(GameLocation location)
         {
-            List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = new List<KeyValuePair<Vector2, Workbench>>();
+            List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = [];
 
             foreach (var pair in location.objects.Pairs)
             {
-                if (pair.Value is Workbench workbench && !(pair.Value is CustomWorkbench))
+                if (pair.Value is Workbench workbench && pair.Value is not CustomWorkbench)
                 {
                     if (IsTerminalAdjacent(pair.Key, location))
                     {
@@ -195,7 +309,7 @@ namespace UltimateStorageSystem
 
         private void RevertCustomWorkbenches(GameLocation location)
         {
-            List<Vector2> customWorkbenchesToRevert = new List<Vector2>();
+            List<Vector2> customWorkbenchesToRevert = [];
 
             foreach (var pair in location.objects.Pairs)
             {
@@ -214,7 +328,7 @@ namespace UltimateStorageSystem
 
         private void ConvertCustomWorkbenchesToStandard(GameLocation location)
         {
-            List<Vector2> customWorkbenchesToRevert = new List<Vector2>();
+            List<Vector2> customWorkbenchesToRevert = [];
 
             foreach (var pair in location.objects.Pairs)
             {
@@ -246,7 +360,7 @@ namespace UltimateStorageSystem
 
         private List<Chest> GetAllChests()
         {
-            List<Chest> chests = new List<Chest>();
+            List<Chest> chests = [];
 
             void AddChestsFromLocation(GameLocation location)
             {
@@ -261,10 +375,10 @@ namespace UltimateStorageSystem
                 }
 
                 // Kühlschrank im Farmhaus prüfen
-                if (location is FarmHouse)
+                if (location is FarmHouse farmHouse)
                 {
-                    Chest fridge = (location as FarmHouse).fridge.Value;                    
-                    if (fridge != null)
+                    Chest fridge =farmHouse.fridge.Value;
+                    if (fridge is not null)
                     {
                         chests.Add(fridge);
                     }
@@ -277,7 +391,7 @@ namespace UltimateStorageSystem
                     {
                         foreach (var building in farm.buildings)
                         {
-                            if (building.indoors.Value != null)
+                            if (building.indoors.Value is not null)
                             {
                                 AddChestsFromLocation(building.indoors.Value);
                             }
@@ -294,17 +408,5 @@ namespace UltimateStorageSystem
 
             return chests;
         }
-
-        private static readonly Vector2[] AdjacentTilesOffsets = new Vector2[]
-        {
-            new Vector2(-1f, 1f),
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(-1f, 0f),
-            new Vector2(1f, 0f),
-            new Vector2(-1f, -1f),
-            new Vector2(0f, -1f),
-            new Vector2(1f, -1f)
-        };
     }
 }

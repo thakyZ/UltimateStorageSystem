@@ -2,11 +2,20 @@
 
   <PropertyGroup>
     <SonarQubeExclude>True</SonarQubeExclude>
-    <ModZipPath>$(SolutionDir)\..\_releases</ModZipPath>
+    <ModZipPath>$(MSBuildProjectDirectory)\..\..\_releases</ModZipPath>
+    <EnableHarmony>True</EnableHarmony>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.2.0" />
   </ItemGroup>
+
+  <Target Name="BeforeCoreBuild" BeforeTargets="CoreCompile" DependsOnTargets="PrepareForBuild">
+    <Exec Command="powershell -Command '&amp; &quot;$(MSBuildProjectDirectory)\..\..\scripts\Compile.ps1&quot; -PreBuild'" />
+  </Target>
+
+  <Target Name="AfterBuild" AfterTargets="Build">
+    <Exec Command="powershell -Command '&amp; &quot;$(MSBuildProjectDirectory)\..\..\scripts\Compile.ps1&quot; -PostBuild'" />
+  </Target>
 
 </Project>

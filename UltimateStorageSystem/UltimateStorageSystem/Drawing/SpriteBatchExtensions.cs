@@ -2,14 +2,14 @@
 // This file contains extension methods for the SpriteBatch object,
 // including a method for drawing lines.
 
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
-
-#nullable disable
 
 namespace UltimateStorageSystem.Drawing
 {
+    /// <summary>
+    /// This class contains extension methods for the SpriteBatch object,
+    /// including a method for drawing lines.
+    /// </summary>
     public static class SpriteBatchExtensions
     {
         // This method draws a line on the screen.

@@ -3,14 +3,8 @@
 // functions for drawing, filtering, sorting, and scrolling through the
 // item list.
 
-using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using StardewValley;
-using UltimateStorageSystem.Utilities;
 using UltimateStorageSystem.Interfaces; // Import the interface
-
-#nullable disable
 
 namespace UltimateStorageSystem.Drawing
 {
@@ -34,8 +28,8 @@ namespace UltimateStorageSystem.Drawing
         {
             this.StartX = startX;
             this.StartY = startY;
-            this.allItems = new List<ItemEntry>();
-            this.filteredItems = new List<ItemEntry>();
+            this.allItems = [];
+            this.filteredItems = [];
             this.ScrollIndex = 0;
         }
 
@@ -98,7 +92,7 @@ namespace UltimateStorageSystem.Drawing
                 return;
 
             // Filters the items whose names contain the search text
-            filteredItems = filteredItems.FindAll(item => item.Name.ToLower().Contains(searchText.ToLower()));
+            filteredItems = filteredItems.FindAll(item => item.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
         }
 
         // Sorts the items in the table based on the specified column and sort direction
@@ -143,8 +137,8 @@ namespace UltimateStorageSystem.Drawing
         public void UpdateItemList(Item item, int remainingAmount)
         {
             // Searches for the entry corresponding to the specified item
-            ItemEntry entry = allItems.Find(i => i.Item == item);
-            if (entry != null)
+            ItemEntry? entry = allItems.Find(i => i.Item == item);
+            if (entry is not null)
             {
                 if (remainingAmount <= 0)
                 {
@@ -167,12 +161,14 @@ namespace UltimateStorageSystem.Drawing
         }
 
         // Processes left-clicks on the table
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163")]
         public void ReceiveLeftClick(int x, int y)
         {
             // Logic for left-clicks on the table
         }
 
         // Processes hover actions on the table
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163")]
         public void PerformHoverAction(int x, int y)
         {
             ItemTableRenderer.PerformHoverAction(x, y, this);

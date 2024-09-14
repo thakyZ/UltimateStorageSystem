@@ -7,12 +7,8 @@ using StardewValley;
 using StardewValley.Objects;
 using StardewValley.Menus;
 using StardewValley.Network;
-using System;
-using System.Collections.Generic;
 using StardewValley.Inventories;
 using StardewValley.Locations;
-
-#nullable disable
 
 namespace UltimateStorageSystem.Overrides
 {
@@ -31,13 +27,13 @@ namespace UltimateStorageSystem.Overrides
         public override bool checkForAction(Farmer who, bool justCheckingForActivity = false)
         {
             GameLocation location = this.Location;
-            if (location == null)
+            if (location is null)
                 return false;
             if (justCheckingForActivity)
                 return true;
 
             // Creates a list of all chests found
-            List<Chest> chestList = new List<Chest>();
+            List<Chest> chestList = [];
 
             void AddChestsFromLocation(GameLocation location)
             {
@@ -52,10 +48,10 @@ namespace UltimateStorageSystem.Overrides
                 }
 
                 // Kühlschrank im Farmhaus prüfen
-                if (location is FarmHouse)
+                if (location is FarmHouse farmHouse)
                 {
-                    Chest fridge = (location as FarmHouse).fridge.Value;
-                    if (fridge != null)
+                    Chest fridge = farmHouse.fridge.Value;
+                    if (fridge is not null)
                     {
                         chestList.Add(fridge);
                     }
@@ -68,7 +64,7 @@ namespace UltimateStorageSystem.Overrides
                     {
                         foreach (var building in farm.buildings)
                         {
-                            if (building.indoors.Value != null)
+                            if (building.indoors.Value is not null)
                             {
                                 AddChestsFromLocation(building.indoors.Value);
                             }
@@ -84,7 +80,7 @@ namespace UltimateStorageSystem.Overrides
             }
 
             // Creates a list for the inventories of the found chests
-            List<IInventory> inventories = new List<IInventory>();
+            List<IInventory> inventories = [];
 
             foreach (Chest chest in chestList)
             {
@@ -99,9 +95,9 @@ namespace UltimateStorageSystem.Overrides
                 globalChestMutex.RequestLock(() =>
                 {
                     // Centers the crafting menu on the screen
-                    Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2);
+                    Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(800 + (IClickableMenu.borderWidth * 2), 600 + (IClickableMenu.borderWidth * 2));
                     // Opens the crafting menu with the collected inventories
-                    Game1.activeClickableMenu = new CraftingPage((int)centeringOnScreen.X, (int)centeringOnScreen.Y, 800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, standaloneMenu: true, materialContainers: inventories);
+                    Game1.activeClickableMenu = new CraftingPage((int)centeringOnScreen.X, (int)centeringOnScreen.Y, 800 + (IClickableMenu.borderWidth * 2), 600 + (IClickableMenu.borderWidth * 2), standaloneMenu: true, materialContainers: inventories);
                     // Sets a function to execute when the menu is closed
                     Game1.activeClickableMenu.exitFunction = () =>
                     {
@@ -123,7 +119,7 @@ namespace UltimateStorageSystem.Overrides
         public override void updateWhenCurrentLocation(GameTime time)
         {
             GameLocation location = this.Location;
-            if (location != null)
+            if (location is not null)
                 globalChestMutex.Update(location);
             base.updateWhenCurrentLocation(time);
         }

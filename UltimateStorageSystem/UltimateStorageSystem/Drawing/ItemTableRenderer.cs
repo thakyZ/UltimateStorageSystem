@@ -2,12 +2,8 @@
 // This file contains methods responsible for drawing the columns, rows,
 // and headers in the item table.
 
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
 using StardewValley.Objects;
-using System;
-using UltimateStorageSystem.Utilities;
 
 namespace UltimateStorageSystem.Drawing
 {
@@ -42,15 +38,16 @@ namespace UltimateStorageSystem.Drawing
         //private static float scrollSpeed = 0.03f; // Scrolling speed
 
         // Draws the headers of the table
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163")]
         public static void DrawHeaders(SpriteBatch b, int startX, int startY, ItemTable table)
         {
             int headerY = startY + 100; // Adjusting the Y-position of the headers
 
             // Draws the headers with icons and stores their positions
-            itemHeaderRect = DrawHeaderWithIcon(b, "Item", new Vector2(startX + 40, headerY), Color.White, false, sortedColumn == "Name" ? isItemSortedAscending : (bool?)null, 0);
-            qtyHeaderRect = DrawHeaderWithIcon(b, "Qty", new Vector2(startX + 445, headerY), Color.White, true, sortedColumn == "Quantity" ? isQtySortedAscending : (bool?)null, -45);
-            valueHeaderRect = DrawHeaderWithIcon(b, "Value", new Vector2(startX + 565, headerY), Color.White, true, sortedColumn == "SingleValue" ? isValueSortedAscending : (bool?)null, -69);
-            totalHeaderRect = DrawHeaderWithIcon(b, "Total", new Vector2(startX + 745, headerY), Color.White, true, sortedColumn == "TotalValue" ? isTotalSortedAscending : (bool?)null, -65);
+            itemHeaderRect = DrawHeaderWithIcon(b, "Item", new Vector2(startX + 40, headerY), Color.White, false, sortedColumn == "Name" ? isItemSortedAscending : null, 0);
+            qtyHeaderRect = DrawHeaderWithIcon(b, "Qty", new Vector2(startX + 445, headerY), Color.White, true, sortedColumn == "Quantity" ? isQtySortedAscending : null, -45);
+            valueHeaderRect = DrawHeaderWithIcon(b, "Value", new Vector2(startX + 565, headerY), Color.White, true, sortedColumn == "SingleValue" ? isValueSortedAscending : null, -69);
+            totalHeaderRect = DrawHeaderWithIcon(b, "Total", new Vector2(startX + 745, headerY), Color.White, true, sortedColumn == "TotalValue" ? isTotalSortedAscending : null, -65);
 
             // Draws a thin line between the column names and the table content
             b.DrawLine(new Vector2(startX + 40, headerY + 35), new Vector2(startX + 750, headerY + 35), Color.White, 1f);
@@ -59,6 +56,9 @@ namespace UltimateStorageSystem.Drawing
         // Draws a single row in the table
         public static void DrawRow(SpriteBatch b, int startX, int rowY, ItemEntry entry, bool isHovered)
         {
+            if (entry.Item is null)
+                return;
+
             // 10-pixel spacing between the line and the table content
             rowY += 10;
 
@@ -80,9 +80,9 @@ namespace UltimateStorageSystem.Drawing
             {
                 iconPosition.Y += 8;  // Shift the icon down for watering cans
             }
-            else if (entry.Item.ParentSheetIndex == 597 ||  // Jazz
-                     entry.Item.ParentSheetIndex == 593 ||  // Fairy Rose
-                     entry.Item.ParentSheetIndex == 376 ||  // Poppy
+            else if (entry.Item.ParentSheetIndex == 597 || // Jazz
+                     entry.Item.ParentSheetIndex == 593 || // Fairy Rose
+                     entry.Item.ParentSheetIndex == 376 || // Poppy
                      entry.Item.ParentSheetIndex == 595)   // Summer Spangle
             {
                 iconPosition.Y += 10;  // Shift the icon down for these items
@@ -102,27 +102,31 @@ namespace UltimateStorageSystem.Drawing
 
             // Determine color based on the quality level of the item
             Color itemColor = Color.White; // Default: White for normal quality
-            if (entry.Item != null)
+            if (entry.Item is not null)
             {
-                switch (entry.Item.Quality)
+                itemColor = entry.Item.Quality switch
                 {
-                    case 1: // Silver
-                        itemColor = new Color(169, 169, 169); // Darker gray
-                        break;
-                    case 2: // Gold
-                        itemColor = Color.Gold;
-                        break;
-                    case 4: // Iridium
-                        itemColor = Color.MediumPurple; // Purple for iridium
-                        break;
-                }
+                    1 =>                          // Silver
+                        new Color(169, 169, 169), // Darker gray
+                    2 =>                          // Gold
+                        Color.Gold,
+                    4 =>                    // Iridium
+                        Color.MediumPurple, // Purple for iridium
+                    _ => itemColor,
+                };
             }
 
             // Limit and truncate text in columns if necessary
-            string itemName = entry.Name.Length > MaxItemNameLength ? entry.Name.Substring(0, MaxItemNameLength) + "..." : entry.Name;
-            string quantityText = entry.Quantity.ToString().PadLeft(MaxQtyLength).Substring(0, MaxQtyLength);
-            string valueText = entry.SingleValue.ToString().PadLeft(MaxValueLength).Substring(0, MaxValueLength);
-            string totalValueText = entry.TotalValue.ToString().PadLeft(MaxTotalLength).Substring(0, MaxTotalLength);
+            string itemName = entry.Name.Length > MaxItemNameLength ? entry.Name[..MaxQtyLength] + "..." : entry.Name;
+            string quantityText = entry.Quantity.ToString().Length > MaxQtyLength
+                                      ? entry.Quantity.ToString().PadLeft(MaxQtyLength)[..MaxQtyLength]
+                                      : entry.Quantity.ToString();
+            string valueText = entry.SingleValue.ToString().Length > MaxValueLength
+                                   ? entry.SingleValue.ToString().PadLeft(MaxValueLength)[..MaxValueLength]
+                                   : entry.SingleValue.ToString();
+            string totalValueText = entry.TotalValue.ToString().Length > MaxTotalLength
+                                        ? entry.TotalValue.ToString().PadLeft(MaxTotalLength)[..MaxTotalLength]
+                                        : entry.TotalValue.ToString();
 
             // Draws the truncated text in the respective columns
             if (isHovered && entry.Name.Length > MaxItemNameLength)
@@ -191,7 +195,7 @@ namespace UltimateStorageSystem.Drawing
                 clickableWidth += (int)(sourceRect.Width * scale * Game1.pixelZoom);
             }
 
-            return new Rectangle((int)(alignRight ? position.X - textSize.X : position.X), (int)position.Y, clickableWidth, (int)(textSize.Y));
+            return new Rectangle((int)(alignRight ? position.X - textSize.X : position.X), (int)position.Y, clickableWidth, (int)textSize.Y);
         }
 
         // Draws text in the table
@@ -229,7 +233,7 @@ namespace UltimateStorageSystem.Drawing
             // Scroll backwards when the end is reached
             if (scrollIndex > maxScrollIndex)
             {
-                scrollIndex = maxScrollIndex * 2 - scrollIndex;
+                scrollIndex = (maxScrollIndex * 2) - scrollIndex;
             }
 
             // Determine the visible part of the text
@@ -286,7 +290,7 @@ namespace UltimateStorageSystem.Drawing
 
                 int startX = table.StartX + 40;
                 int startY = table.StartY + 100;
-                int rowY = startY + 32 * (i + 1) + 10;
+                int rowY = startY + (32 * (i + 1)) + 10;
                 if (new Rectangle(startX - 20, rowY, 740, 32).Contains(x, y))
                 {
                     hoverRowIndex = i;

@@ -2,15 +2,15 @@
 // This file defines a scrollbar used for navigating the
 // item table and handles the corresponding user interactions.
 
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
 using UltimateStorageSystem.Interfaces; // Import the interface
-
-#nullable disable
 
 namespace UltimateStorageSystem.Drawing
 {
+    /// <summary>
+    /// This class defines a scrollbar used for navigating the
+    /// item table and handles the corresponding user interactions.
+    /// </summary>
     public class Scrollbar
     {
         // Areas for the scrollbar
@@ -22,9 +22,9 @@ namespace UltimateStorageSystem.Drawing
         // Constructor, initializes the scrollbar with position and associated table
         public Scrollbar(int x, int y, IScrollableTable table)
         {
-            this.table = table;
-            scrollBarRunner = new Rectangle(x - 5, y + 40, 20, 400);  // Offset the scrollbar 40px down and 5px to the left
-            scrollBar = new Rectangle(scrollBarRunner.X, scrollBarRunner.Y, 20, 20);
+            this.table      = table;
+            scrollBarRunner = new Rectangle(x - 5,             y + 40,            20, 400);  // Offset the scrollbar 40px down and 5px to the left
+            scrollBar       = new Rectangle(scrollBarRunner.X, scrollBarRunner.Y, 20, GetScrollBarHeight());
         }
 
         // Draws the scrollbar on the screen
@@ -48,6 +48,7 @@ namespace UltimateStorageSystem.Drawing
         }
 
         // Handles held left-clicks and adjusts the scrollbar accordingly
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163")]
         public void LeftClickHeld(int x, int y)
         {
             if (isScrolling)
@@ -57,7 +58,8 @@ namespace UltimateStorageSystem.Drawing
         }
 
         // Ends the scrolling process when the mouse button is released
-        public void ReleaseLeftClick(int _x, int _y)
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163")]
+        public void ReleaseLeftClick(int x, int y)
         {
             isScrolling = false;
         }
@@ -72,10 +74,9 @@ namespace UltimateStorageSystem.Drawing
             UpdateScrollBarPosition();
         }
 
-        // Updates the scrollbar position based on the current scroll index of the table
-        public void UpdateScrollBarPosition()
+        public int GetScrollBarHeight()
         {
-            int itemCount = table.GetItemEntriesCount();
+            int itemCount   = table.GetItemEntriesCount();
             int visibleRows = table.GetVisibleRows();
 
             if (itemCount > visibleRows)
@@ -84,8 +85,23 @@ namespace UltimateStorageSystem.Drawing
                 float proportionVisible = visibleRows / (float)itemCount;
 
                 // Adjust the height of the scrollbar slider
-                scrollBar.Height = (int)(scrollBarRunner.Height * proportionVisible);
+                return (int)(scrollBarRunner.Height * proportionVisible);
+            }
 
+            return scrollBarRunner.Height;
+        }
+
+        // Updates the scrollbar position based on the current scroll index of the table
+        public void UpdateScrollBarPosition()
+        {
+            int itemCount = table.GetItemEntriesCount();
+            int visibleRows = table.GetVisibleRows();
+
+            // Adjust the height of the scrollbar slider
+            scrollBar.Height = GetScrollBarHeight();
+
+            if (itemCount > visibleRows)
+            {
                 // Calculate where the slider should be positioned
                 float percent = table.ScrollIndex / (float)(itemCount - visibleRows);
                 scrollBar.Y = scrollBarRunner.Y + (int)(percent * (scrollBarRunner.Height - scrollBar.Height));

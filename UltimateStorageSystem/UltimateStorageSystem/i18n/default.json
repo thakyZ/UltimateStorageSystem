@@ -1,4 +1,8 @@
 ﻿{
-    "no_storage_space_message": "Choose a storage spot for this item first!"
+  "config.hotkeys.title": "Hotkeys",
+  "config.open-farm-link-terminal-hotkey.name": "Open FarmLink Terminal",
+  "config.open-farm-link-terminal-hotkey.desc": "Key to open the FarmLink terminal.",
+  "message.warning.no_storage_space": "Choose a storage spot for this item first!",
+  "label.chest-blacklist-button.desc": "Add chest to farmlink terminal blacklist."
 }
 

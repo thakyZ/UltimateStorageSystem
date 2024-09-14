@@ -3,16 +3,9 @@
 // und verschiedenen Truhen im Spiel. Sie behandelt das Stapeln von Gegenständen, das Übertragen
 // und Sortieren innerhalb des FarmLink-Terminals.
 
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using StardewValley;
 using StardewValley.Objects;
 using StardewValley.Tools;
 using UltimateStorageSystem.Drawing;
-using UltimateStorageSystem.Utilities;
-
-#nullable disable
 
 namespace UltimateStorageSystem.Tools
 {
@@ -33,13 +26,13 @@ namespace UltimateStorageSystem.Tools
         {
             itemTable.ClearItems();
 
-            Dictionary<string, ItemEntry> groupedItems = new Dictionary<string, ItemEntry>();
+            Dictionary<string, ItemEntry> groupedItems = [];
 
             foreach (var chest in chests)
             {
                 foreach (var item in chest.Items)
                 {
-                    if (item != null)
+                    if (item is not null)
                     {
                         string key = $"{item.DisplayName}_{item.Category}_{item.Quality}_{item.ParentSheetIndex}";
 
@@ -79,7 +72,7 @@ namespace UltimateStorageSystem.Tools
         // Methode zum Sammeln aller Gegenstände eines Typs aus den Truhen
         private List<Item> CollectItemsFromChests(Item item, int amount)
         {
-            List<Item> collectedItems = new List<Item>();
+            List<Item> collectedItems = [];
             int remainingAmount = amount;
 
             // Sortiere die Truhen nach der Anzahl vorhandener Gegenstände in aufsteigender Reihenfolge
@@ -87,7 +80,7 @@ namespace UltimateStorageSystem.Tools
                 .Select(chest => new
                 {
                     Chest = chest,
-                    ItemCount = chest.Items.Where(i => i != null && i.canStackWith(item)).Sum(i => i.Stack)
+                    ItemCount = chest.Items.Where(i => i?.canStackWith(item) == true).Sum(i => i.Stack)
                 })
                 .Where(chestInfo => chestInfo.ItemCount > 0) // Nur Truhen mit dem Gegenstandstyp
                 .OrderBy(chest => chest.ItemCount)
@@ -101,12 +94,13 @@ namespace UltimateStorageSystem.Tools
                 {
                     Item chestItem = chest.Items[i];
 
-                    if (chestItem != null && chestItem.canStackWith(item))
+                    if (chestItem?.canStackWith(item) == true)
                     {
                         int transferAmount = Math.Min(chestItem.Stack, remainingAmount);
 
                         // Sicherstellen, dass mindestens ein Item verbleibt, wenn es die letzte Truhe ist
-                        if (chestItem.Stack - transferAmount <= 0 && chestItem.Stack > 1 && chest == sortedChests.Last().Chest)
+                        // chestItem.Stack - transferAmount <= 0
+                        if (chestItem.Stack <= transferAmount && chestItem.Stack > 1 && chest == sortedChests[^1].Chest)
                         {
                             transferAmount = chestItem.Stack - 1;
                         }
@@ -149,7 +143,7 @@ namespace UltimateStorageSystem.Tools
                 .Select(chest => new
                 {
                     Chest = chest,
-                    ItemCount = chest.Items.Where(i => i != null && i.canStackWith(item)).Sum(i => i.Stack)
+                    ItemCount = chest.Items.Where(i => i?.canStackWith(item) == true).Sum(i => i.Stack)
                 })
                 .Where(chestInfo => chestInfo.ItemCount > 0) // Nur Truhen mit dem Item-Typ
                 .OrderByDescending(chestInfo => chestInfo.ItemCount)
@@ -165,7 +159,7 @@ namespace UltimateStorageSystem.Tools
                 Item addedItem = chest.addItem(remainingItem);
 
                 // Bestimmen der tatsächlich übertragenen Menge
-                if (addedItem == null)
+                if (addedItem is null)
                 {
                     remainingAmount = 0;
                 }
@@ -194,7 +188,7 @@ namespace UltimateStorageSystem.Tools
             // Wenn nicht alle Items übertragen werden konnten, verbleiben sie im Inventar, und eine Benachrichtigung wird angezeigt
             if (remainingAmount > 0)
             {
-                Game1.addHUDMessage(new HUDMessage(ModEntry.Instance.Helper.Translation.Get("no_storage_space_message"), 3));
+                Game1.addHUDMessage(new HUDMessage(I18n.Message_Warning_NoStorageSpace(), 3));
             }
 
             UpdateChestItemsAndSort();
@@ -222,8 +216,8 @@ namespace UltimateStorageSystem.Tools
                 if (!isInInventory)
                 {
                     // Suche die Truhe, die den Ausrüstungsgegenstand enthält
-                    Chest sourceChest = chests.FirstOrDefault(chest => chest.Items.Contains(item));
-                    if (sourceChest != null)
+                    Chest? sourceChest = chests.Find(chest => chest.Items.Contains(item));
+                    if (sourceChest is not null)
                     {
                         // Temporäres Verschieben des Gegenstands aus der Truhe
                         sourceChest.Items.Remove(item);
@@ -249,8 +243,8 @@ namespace UltimateStorageSystem.Tools
                 else
                 {
                     // Hier ist der Code für den Linksklick mit Umschalttaste zu prüfen
-                    var entry = itemTable.GetItemEntries().FirstOrDefault(e => e.Item == item);
-                    if (entry != null)
+                    var entry = itemTable.GetItemEntries().Find(e => e.Item == item);
+                    if (entry is not null)
                     {
                         int maxStackSize = item.maximumStackSize();
                         int stackSize = Math.Min(maxStackSize / 2, entry.Quantity / 2); // Maximale Größe ist ein halbes Stack oder die Hälfte der verfügbaren Menge
@@ -274,8 +268,8 @@ namespace UltimateStorageSystem.Tools
         {
             int amountToTransfer = shiftPressed ? 10 : 1;
 
-            var entry = itemTable.GetItemEntries().FirstOrDefault(e => e.Item == item);
-            if (entry != null)
+            var entry = itemTable.GetItemEntries().Find(e => e.Item == item);
+            if (entry is not null)
             {
                 int maxStackSize = item.maximumStackSize();
                 amountToTransfer = Math.Min(amountToTransfer, Math.Min(entry.Quantity, maxStackSize - 1));
@@ -285,8 +279,8 @@ namespace UltimateStorageSystem.Tools
             {
                 if (!isInInventory)
                 {
-                    Chest sourceChest = chests.FirstOrDefault(chest => chest.Items.Contains(item));
-                    if (sourceChest != null)
+                    Chest? sourceChest = chests.Find(chest => chest.Items.Contains(item));
+                    if (sourceChest is not null)
                     {
                         sourceChest.Items.Remove(item);
                         Game1.player.addItemToInventory(item);

@@ -2,19 +2,20 @@
 // This file implements a search box that allows the user to
 // filter the item table based on specific terms.
 
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
 using StardewValley.Menus;
 using UltimateStorageSystem.Interfaces; // Import the interface
 
-#nullable disable
-
 namespace UltimateStorageSystem.Drawing
 {
+    /// <summary>
+    /// This class implements a search box that allows the user to
+    /// filter the item table based on specific terms.
+    /// </summary>
     public class SearchBox
     {
         // Properties of the search box
+        [SuppressMessage("Roslynator", "RCS1170")]
         public TextBox textBox { get; private set; } // The actual textbox for input
         private readonly IFilterableTable table; // Reference to the table being filtered
         private readonly Scrollbar scrollbar; // Reference to the scrollbar
@@ -81,7 +82,7 @@ namespace UltimateStorageSystem.Drawing
 
             // Draws the text in the textbox
             Vector2 textSize = Game1.smallFont.MeasureString(textBox.Text);
-            Vector2 textPosition = new Vector2(textBox.X + 6, textBox.Y + ((textBox.Height - textSize.Y) + 4) / 2);
+            Vector2 textPosition = new Vector2(textBox.X + 6, textBox.Y + ((textBox.Height - textSize.Y + 4) / 2));
             b.DrawString(Game1.smallFont, textBox.Text, textPosition, Color.Black);
 
             // Draws the cursor if the textbox is active

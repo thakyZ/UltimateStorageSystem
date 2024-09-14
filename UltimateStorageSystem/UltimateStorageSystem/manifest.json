@@ -11,6 +11,14 @@
     {
       "UniqueID": "holybananapants.UltimateStorageSystemContentPack",
       "MinimumVersion": "1.0.0"
+    },
+    {
+      "UniqueID": "spacechase0.GenericModConfigMenu",
+      "MinimumVersion": "1.6.0"
+    },
+    {
+      "UniqueID": "spacechase0.SpaceCore",
+      "MinimumVersion": "1.25.2"
     }
   ]
 }

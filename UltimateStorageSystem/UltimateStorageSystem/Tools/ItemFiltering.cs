@@ -2,12 +2,6 @@
 // This file provides a method for filtering items in a list
 // based on a search text.
 
-using System.Collections.Generic;
-using System.Linq;
-using UltimateStorageSystem.Utilities;
-
-#nullable disable
-
 namespace UltimateStorageSystem.Tools
 {
     public static class ItemFiltering
@@ -22,7 +16,7 @@ namespace UltimateStorageSystem.Tools
             }
 
             // Filter the items that contain the search text (case-insensitive)
-            return items.Where(entry => entry.Name.Contains(searchText, System.StringComparison.OrdinalIgnoreCase)).ToList();
+            return items.Where(entry => entry.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 }

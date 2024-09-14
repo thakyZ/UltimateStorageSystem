@@ -1,11 +1,9 @@
 ﻿// FARMLINKTERMINAL.CS
-// This file contains a method that checks if the player is standing 
+// This file contains a method that checks if the player is standing
 // below a specific tile and is facing upward.
 
 using StardewValley;
 using Microsoft.Xna.Framework;
-
-#nullable disable
 
 namespace UltimateStorageSystem.Tools
 {
@@ -15,8 +13,8 @@ namespace UltimateStorageSystem.Tools
         public static bool IsPlayerBelowTileAndFacingUp(Farmer player, Vector2 tile)
         {
             // Calculate the tile position of the player
-            int playerTileX = (int)((player.Position.X + Game1.tileSize / 2 + player.Sprite.SpriteWidth / 2) / Game1.tileSize);
-            int playerTileY = (int)((player.Position.Y + player.Sprite.SpriteHeight / 2) / Game1.tileSize);
+            int playerTileX = (int)((player.Position.X + (Game1.tileSize / 2) + (player.Sprite.SpriteWidth / 2)) / Game1.tileSize);
+            int playerTileY = (int)((player.Position.Y + (player.Sprite.SpriteHeight / 2)) / Game1.tileSize);
             Vector2 playerTile = new(playerTileX, playerTileY);
 
             // Check if the player is facing upward

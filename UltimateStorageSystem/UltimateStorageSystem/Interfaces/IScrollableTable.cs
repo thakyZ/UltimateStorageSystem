@@ -1,7 +1,9 @@
-﻿namespace UltimateStorageSystem.Interfaces;
-public interface IScrollableTable
+﻿namespace UltimateStorageSystem.Interfaces
 {
-    int ScrollIndex { get; set; }
-    int GetItemEntriesCount();
-    int GetVisibleRows();
+    public interface IScrollableTable
+    {
+        int ScrollIndex { get; set; }
+        int GetItemEntriesCount();
+        int GetVisibleRows();
+    }
 }

@@ -190,11 +190,6 @@ DynamicParam {
     Throw [Exception]::new("Failed to find 'dotnet.exe' on the system path.");
   }
 
-<#
-  If ($Null -eq $7Zip) {
-    Write-Warning -Message 'Failed to find 7-Zip on system path. Will not be packaging the mod.';
-  }
-#>
   [string] $ModProjDir    = (Get-Item -LiteralPath $ModCsProj).Directory.FullName;
   [string] $ReleasesDir   = (Join-Path -Path $PSScriptRoot -ChildPath '_releases');
   [string] $OutputFile    = (Join-Path -Path $ReleasesDir  -ChildPath "$($Mod) 0.0.0.zip");
@@ -214,39 +209,25 @@ DynamicParam {
     $ModCsProj = $Items[0].FullName;
   }
 } Process {
-  [Process] $DotNetProcess = (Start-Process -NoNewWindow -FilePath $DotNet -Wait -ArgumentList @('build', $ModCsProj, "-property:Configuration=$($Configuration)", "-property:SolutionDir=$($PWD)") -PassThru);
+  [Process] $DotNetProcess = (Start-Process -NoNewWindow -FilePath $DotNet -Wait -ArgumentList @('build', $ModCsProj, "-property:Configuration=$($Configuration)") -PassThru);
 
   If ($DotNetProcess.ExitCode -ne 0) {
     Throw [Exception]::new("DotNet exited with exit code $($DotNetProcess.ExitCode).");
   }
 
-<#If ($Null -ne $7Zip) {
-    [string] $OutputDir = (Join-Path -Path $PSScriptRoot -ChildPath 'dist');
-    If (-not [Directory]::Exists($OutputDir)) {
-      $OutputDir = (New-Item -Path $OutputDir -ItemType Directory).FullName;
-    }
-    [string] $OutputFile = (Join-Path -Path $OutputDir -ChildPath "$($Mod).zip");
-    If ([File]::Exists($OutputFile)) {
-      Remove-Item -LiteralPath $OutputFile -Force -ErrorAction Stop;
-    }
-    [Process] $7ZipProcess = (Start-Process -NoNewWindow -FilePath $7Zip.Source -Wait -ArgumentList @('a', $OutputFile, $TranslationDir, $BuildOutput, $ManifestFile) -PassThru);
-    If ($7ZipProcess.ExitCode -ne 0) {
-      Write-Error -Message "7-Zip exited with exit code $($7ZipProcess.ExitCode).";
-      Exit 1;
-    }
-    Write-Host -Object "Mod packaged to file at: `"$($OutputFile)`"";
-  }#>
-
   If  (-not [File]::Exists($OutputFile)) {
-    $Items = (Get-ChildItem -LiteralPath $ReleasesDir -File -Filter '*.zip' | Where-Object { $_.BaseName.StartsWith($Mod) } | Select-Object -Property FullName,Name,Extension,@{Name='Version';Expression={
-      [string]  $VersionString = (Trim-StringStart -String $_.BaseName -ToTrim "$($Mod) ");
-      [Version] $Version = $Null;
-      If (-not [Version]::TryParse($VersionString, [ref] $Version)) {
-        Write-Error -Message "Failed to parse version string of value `"$($VersionString)`" to type of [System.Version]." | Out-Host;
-        Return $Null;
+    $Items = (Get-ChildItem -LiteralPath $ReleasesDir -File -Filter '*.zip' | Where-Object { $_.BaseName.StartsWith($Mod) } | Select-Object -Property FullName, Name, Extension, @{
+      Name = 'Version';
+      Expression = {
+        [string]  $VersionString = (Trim-StringStart -String $_.BaseName -ToTrim "$($Mod) ");
+        [Version] $Version = $Null;
+        If (-not [Version]::TryParse($VersionString, [ref] $Version)) {
+          Write-Error -Message "Failed to parse version string of value `"$($VersionString)`" to type of [System.Version]." | Out-Host;
+          Return $Null;
+        }
+        Return $Version
       }
-      Return $Version
-    }});
+    });
     If ($Items.Count -eq 0) {
       Throw [Exception]::new("Unexpected error occurred, could not find the mod output archive. Expected file at `"$($OutputFile)`" or an equivalent.");
     } ElseIf ($Items.Count -gt 1) {

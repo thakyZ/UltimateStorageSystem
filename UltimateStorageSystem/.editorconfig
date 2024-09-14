@@ -2,8 +2,35 @@
 root = true
 
 [*]
-vsspell_section_id = 356d424878254b28af6f5ab1f32eb995
-vsspell_dictionary_languages_356d424878254b28af6f5ab1f32eb995 = inherited,en-US,de-DE
+vsspell_spell_check_as_you_type = false
+vsspell_include_in_project_spell_check = true
+vsspell_code_analyzers_enabled = false
+vsspell_detect_doubled_words = false
+vsspell_ignore_words_with_digits = true
+vsspell_ignore_words_in_all_uppercase = true
+vsspell_ignore_words_in_mixed_case = true
+vsspell_ignore_format_specifiers = true
+vsspell_ignore_filenames_and_email_addresses = true
+vsspell_ignore_xml_elements_in_text = true
+vsspell_treat_underscore_as_separator = true
+vsspell_ignore_mnemonics = true
+vsspell_ignored_character_class = NonLatin
+vsspell_code_analyzer_ignore_identifier_if_private = true
+vsspell_code_analyzer_ignore_identifier_if_internal = true
+vsspell_code_analyzer_ignore_identifier_if_all_uppercase = true
+vsspell_code_analyzer_ignore_identifiers_within_member_bodies = true
+vsspell_code_analyzer_ignore_type_parameters = true
+vsspell_code_analyzer_ignore_if_compiler_generated = true
+vsspell_code_analyzer_ignore_xml_doc_comments = true
+vsspell_code_analyzer_ignore_delimited_comments = true
+vsspell_code_analyzer_ignore_standard_single_line_comments = true
+vsspell_code_analyzer_ignore_quadruple_slash_comments = true
+vsspell_code_analyzer_ignore_normal_strings = true
+vsspell_code_analyzer_ignore_verbatim_strings = true
+vsspell_code_analyzer_ignore_interpolated_strings = true
+vsspell_code_analyzer_ignore_raw_strings = true
+vsspell_code_analyzer_apply_to_all_c_style_languages = true
+vsspell_cad_recognized_word_handling = None
 
 # C# files
 [*.cs]
@@ -116,7 +143,7 @@ csharp_style_prefer_readonly_struct_member = true
 # Code-block preferences
 csharp_prefer_braces = true:silent
 csharp_prefer_simple_using_statement = false:silent
-csharp_style_namespace_declarations = file_scoped:silent
+csharp_style_namespace_declarations = block_scoped:silent
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_primary_constructors = false:suggestion
 csharp_style_prefer_top_level_statements = false:warning
@@ -124,7 +151,7 @@ csharp_style_prefer_top_level_statements = false:warning
 # Expression-level preferences
 csharp_prefer_simple_default_expression = true:silent
 csharp_style_deconstructed_variable_declaration = true
-csharp_style_implicit_object_creation_when_type_is_apparent = true
+csharp_style_implicit_object_creation_when_type_is_apparent = false
 csharp_style_inlined_variable_declaration = true
 csharp_style_prefer_index_operator = true
 csharp_style_prefer_local_over_anonymous_function = true
@@ -220,9 +247,6 @@ dotnet_diagnostic.S1450.severity = none
 
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none
-vsspell_section_id = b5f0cf6d5a1946e187946519e015b5a5
-vsspell_dictionary_languages_b5f0cf6d5a1946e187946519e015b5a5 = inherited,en-US,de-DE
-
 
 [*.cs]
 #### Naming styles ####
@@ -337,6 +361,15 @@ dotnet_naming_style._camelcase.required_suffix =
 dotnet_naming_style._camelcase.word_separator =
 dotnet_naming_style._camelcase.capitalization = camel_case
 
+# RCS1169: Make field read-only
+dotnet_diagnostic.RCS1169.severity = none
+
+# RCS1118: Mark local variable as const
+dotnet_diagnostic.RCS1118.severity = none
+
+# RCS1205: Order named arguments according to the order of parameters
+dotnet_diagnostic.RCS1205.severity = none
+
 [*.{cs,vb}]
 #### Naming styles ####
 
@@ -392,11 +425,11 @@ dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
 dotnet_style_prefer_auto_properties = true:silent
-dotnet_style_object_initializer = true:suggestion
+dotnet_style_object_initializer = false:suggestion
 dotnet_style_collection_initializer = true:suggestion
 dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
-dotnet_style_prefer_conditional_expression_over_assignment = true:suggestion
-dotnet_style_prefer_conditional_expression_over_return = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = false:suggestion
+dotnet_style_prefer_conditional_expression_over_return = false:suggestion
 dotnet_style_explicit_tuple_names = true:suggestion
 dotnet_style_prefer_inferred_tuple_names = true:suggestion
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion

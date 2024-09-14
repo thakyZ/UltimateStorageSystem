@@ -6,8 +6,6 @@ using Microsoft.Xna.Framework.Input;
 using StardewValley.Menus;
 using UltimateStorageSystem.Drawing;
 
-#nullable disable
-
 namespace UltimateStorageSystem.Tools
 {
     public class InputHandler

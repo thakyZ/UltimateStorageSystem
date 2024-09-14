@@ -1,9 +1,5 @@
-﻿using StardewValley;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Menus;
-
-#nullable disable
 
 namespace UltimateStorageSystem.Drawing
 {
@@ -29,7 +25,7 @@ namespace UltimateStorageSystem.Drawing
             inventoryMenuWidth = slotsPerRow * slotSize;
 
             // Position of the inventory menu.
-            int inventoryMenuX = this.xPositionOnScreen + (containerWidth - inventoryMenuWidth) / 2;
+            int inventoryMenuX = this.xPositionOnScreen + ((containerWidth - inventoryMenuWidth) / 2);
             int inventoryMenuY = this.yPositionOnScreen + computerMenuHeight + 55;
             playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, true);
         }

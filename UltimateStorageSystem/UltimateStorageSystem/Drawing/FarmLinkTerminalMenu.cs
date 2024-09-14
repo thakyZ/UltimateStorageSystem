@@ -1,14 +1,8 @@
-﻿using StardewValley;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewValley.Menus;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using UltimateStorageSystem.Tools;
-using UltimateStorageSystem.Utilities;
-using System.Collections.Generic;
+using StardewValley.Menus;
 using StardewValley.Objects;
-
-#nullable disable
+using UltimateStorageSystem.Tools;
 
 namespace UltimateStorageSystem.Drawing
 {
@@ -32,7 +26,7 @@ namespace UltimateStorageSystem.Drawing
         private int selectedTab; // Der aktuell ausgewählte Reiter
 
         // Constructor for the menu, initializes the GUI components.
-        public FarmLinkTerminalMenu(List<Chest> chests) : base(Game1.viewport.Width / 2 - 400, Game1.viewport.Height / 2 - 500, 800, 1000)
+        public FarmLinkTerminalMenu(List<Chest> chests) : base((Game1.viewport.Width / 2) - 400, (Game1.viewport.Height / 2) - 500, 800, 1000)
         {
             // Calculate the position of the container relative to the screen.
             this.xPositionOnScreen = (Game1.viewport.Width - this.containerWidth) / 2;
@@ -47,7 +41,7 @@ namespace UltimateStorageSystem.Drawing
             inventoryMenuWidth = slotsPerRow * slotSize;
 
             // Position of the inventory menu.
-            int inventoryMenuX = this.xPositionOnScreen + (containerWidth - inventoryMenuWidth) / 2;
+            int inventoryMenuX = this.xPositionOnScreen + ((containerWidth - inventoryMenuWidth) / 2);
             int inventoryMenuY = this.yPositionOnScreen + computerMenuHeight + 55;
             playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, true);
 
@@ -70,13 +64,13 @@ namespace UltimateStorageSystem.Drawing
             ItemTableRenderer.SetSortState("Name", true);
 
             // Reiter initialisieren
-            tabs = new List<ClickableTextureComponent>
-            {
+            tabs =
+            [
                 new ClickableTextureComponent("Terminal", new Rectangle(xPositionOnScreen + 20, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
                 //new ClickableTextureComponent("Tab2", new Rectangle(xPositionOnScreen + 88, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
                 //new ClickableTextureComponent("Tab3", new Rectangle(xPositionOnScreen + 156, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
                 //new ClickableTextureComponent("Tab4", new Rectangle(xPositionOnScreen + 224, yPositionOnScreen - 64, 64, 64), null, null, Game1.mouseCursors, new Rectangle(16, 368, 16, 16), 4f),
-            };
+            ];
 
             selectedTab = 0; // Standardmäßig den ersten Reiter auswählen
         }
@@ -223,8 +217,10 @@ namespace UltimateStorageSystem.Drawing
                 }
                 else // Index == 3
                 {
-                    // Hier die Zuweisung von basketTexture
-                    Texture2D basketTexture = ModEntry.basketTexture;
+                    // Hier die Zuweisung von BasketTexture
+                    Texture2D? basketTexture = ModEntry.BasketTexture;
+
+                    if (basketTexture is null) continue;
                     sourceRect = new Rectangle(0, 0, basketTexture.Width, basketTexture.Height);
 
                     // Position des Basket-Icons anpassen
@@ -267,8 +263,8 @@ namespace UltimateStorageSystem.Drawing
                     inputHandler.ReceiveLeftClick(x, y, playSound);
                     itemTable.ReceiveLeftClick(x, y);
 
-                    Item clickedItem = GetItemAt(x, y, out bool isInInventory);
-                    if (clickedItem != null)
+                    Item? clickedItem = GetItemAt(x, y, out bool isInInventory);
+                    if (clickedItem is not null)
                     {
                         bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
                         itemTransferManager.HandleLeftClick(clickedItem, isInInventory, shiftPressed);
@@ -285,16 +281,16 @@ namespace UltimateStorageSystem.Drawing
         // Processes right-clicks on the menu.
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
-            if (ModEntry.Instance.ignoreNextRightClick)
+            if (ModEntry.Instance.IgnoreNextRightClick)
             {
-                ModEntry.Instance.ignoreNextRightClick = false;
+                ModEntry.Instance.IgnoreNextRightClick = false;
                 return;
             }
 
             if (selectedTab == 0)
             {
-                Item clickedItem = GetItemAt(x, y, out bool isInInventory);
-                if (clickedItem != null)
+                Item? clickedItem = GetItemAt(x, y, out bool isInInventory);
+                if (clickedItem is not null)
                 {
                     bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
                     itemTransferManager.HandleRightClick(clickedItem, isInInventory, shiftPressed);
@@ -306,7 +302,7 @@ namespace UltimateStorageSystem.Drawing
         }
 
         // Retrieves the clicked item from the inventory or table.
-        private Item GetItemAt(int x, int y, out bool isInInventory)
+        private Item? GetItemAt(int x, int y, out bool isInInventory)
         {
             isInInventory = false;
 
@@ -327,7 +323,7 @@ namespace UltimateStorageSystem.Drawing
 
                 int startX = itemTable.StartX + 40;
                 int startY = itemTable.StartY + 100;
-                int rowY = startY + 32 * (i + 1) + 10;
+                int rowY = startY + (32 * (i + 1)) + 10;
                 if (new Rectangle(startX - 20, rowY, 740, 32).Contains(x, y))
                 {
                     return itemTable.GetItemEntries()[index].Item;
