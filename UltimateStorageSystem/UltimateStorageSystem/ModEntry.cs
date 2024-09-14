@@ -12,6 +12,7 @@ using System.Linq;
 using System.IO;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
+using HarmonyLib;
 
 #nullable disable
 
@@ -30,6 +31,7 @@ namespace UltimateStorageSystem
         private ModConfig config;
         private SButton? openTerminalHotkey;  // Nullable SButton für den Hotkey
         private readonly string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
+        internal static string FarmLinkTerminalName => Instance.farmLinkTerminalName; // Required for the patch.
         public bool ignoreNextRightClick = true;
 
         public override void Entry(IModHelper helper)
@@ -39,8 +41,12 @@ namespace UltimateStorageSystem
             // Initiales Laden der Konfiguration aus der config.json
             LoadConfig();
 
-            // Laden der Texturen aus dem Assets Ordner            
+            // Laden der Texturen aus dem Assets Ordner
             basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
+
+            // Patch all harmony patches.
+            Harmony harmony = new Harmony("holybananapants.UltimateStorageSystem");
+            harmony.PatchAll();
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
             helper.Events.World.ObjectListChanged += OnObjectListChanged;
@@ -78,26 +84,32 @@ namespace UltimateStorageSystem
 
         private void OnSaveLoaded(object sender, SaveLoadedEventArgs e)
         {
+            /* Unused now.
             foreach (var location in Game1.locations)
             {
                 CheckForFarmLinkTerminal(location);
             }
+            */
         }
 
         private void OnSaving(object sender, SavingEventArgs e)
         {
+            /* Unused now.
             foreach (var location in Game1.locations)
             {
                 ConvertCustomWorkbenchesToStandard(location);
             }
+            */
         }
 
         private void OnSaved(object sender, SavedEventArgs e)
         {
+            /* Unused now.
             foreach (var location in Game1.locations)
             {
                 CheckForFarmLinkTerminal(location);
             }
+            */
         }
 
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e)
@@ -128,7 +140,9 @@ namespace UltimateStorageSystem
 
         private void OnLocationChanged(object sender, WarpedEventArgs e)
         {
+            /* Unused now.
             CheckForFarmLinkTerminal(e.NewLocation);
+            */
         }
 
         private void OnObjectListChanged(object sender, ObjectListChangedEventArgs e)
@@ -138,7 +152,9 @@ namespace UltimateStorageSystem
                 RevertCustomWorkbenches(e.Location);
             }
 
+            /* Unused now.
             CheckForFarmLinkTerminal(e.Location);
+            */
         }
 
         private bool IsFarmLinkTerminalPlaced()
@@ -158,6 +174,7 @@ namespace UltimateStorageSystem
             return false;
         }
 
+        /* Unused now.
         private void CheckForFarmLinkTerminal(GameLocation location)
         {
             List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = new List<KeyValuePair<Vector2, Workbench>>();
@@ -179,7 +196,9 @@ namespace UltimateStorageSystem
                 location.objects.Add(pair.Key, new CustomWorkbench(pair.Key));
             }
         }
+        */
 
+        /* Unused now.
         private bool IsTerminalAdjacent(Vector2 tileLocation, GameLocation location)
         {
             foreach (var offset in AdjacentTilesOffsets)
@@ -192,7 +211,9 @@ namespace UltimateStorageSystem
             }
             return false;
         }
+        */
 
+        // Still use this to unpatch ny CustomWorkbenches if required.
         private void RevertCustomWorkbenches(GameLocation location)
         {
             List<Vector2> customWorkbenchesToRevert = new List<Vector2>();
@@ -212,6 +233,7 @@ namespace UltimateStorageSystem
             }
         }
 
+        /* Unused now.
         private void ConvertCustomWorkbenchesToStandard(GameLocation location)
         {
             List<Vector2> customWorkbenchesToRevert = new List<Vector2>();
@@ -230,6 +252,7 @@ namespace UltimateStorageSystem
                 location.objects.Add(tileLocation, new Workbench(tileLocation));
             }
         }
+        */
 
         private bool IsFarmLinkTerminalOnTile(Vector2 tile, out StardewValley.Object terminalObject)
         {
@@ -263,7 +286,7 @@ namespace UltimateStorageSystem
                 // Kühlschrank im Farmhaus prüfen
                 if (location is FarmHouse)
                 {
-                    Chest fridge = (location as FarmHouse).fridge.Value;                    
+                    Chest fridge = (location as FarmHouse).fridge.Value;
                     if (fridge != null)
                     {
                         chests.Add(fridge);
@@ -295,7 +318,7 @@ namespace UltimateStorageSystem
             return chests;
         }
 
-        private static readonly Vector2[] AdjacentTilesOffsets = new Vector2[]
+        internal static readonly Vector2[] AdjacentTilesOffsets = new Vector2[] // Changed to internal static for the patch.
         {
             new Vector2(-1f, 1f),
             new Vector2(0f, 1f),

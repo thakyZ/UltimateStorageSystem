@@ -19,6 +19,7 @@ namespace UltimateStorageSystem.Overrides
     [Serializable]
     public class CustomWorkbench : Workbench
     {
+      /* Whole class is unused we don't need to have anything inside now.
         public static readonly NetMutex globalChestMutex = new NetMutex();
 
         // Default constructor
@@ -127,5 +128,6 @@ namespace UltimateStorageSystem.Overrides
                 globalChestMutex.Update(location);
             base.updateWhenCurrentLocation(time);
         }
+        */
     }
 }
