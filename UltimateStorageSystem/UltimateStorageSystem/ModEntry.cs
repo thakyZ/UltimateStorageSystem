@@ -1,7 +1,11 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System.Linq;
+using System.IO;
+using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using StardewModdingAPI.Events;
+using HarmonyLib;
 using UltimateStorageSystem.Drawing;
 using UltimateStorageSystem.Integrations.GenericModConfigMenu;
 using UltimateStorageSystem.Tools;
@@ -29,8 +33,8 @@ namespace UltimateStorageSystem
         ];
 
         /// <summary>Farmlink Terminal Data for blacklisting chests from the Farmlink Terminal.</summary>
-        internal FarmLinkTerminalData? FarmLinkTerminalData => _farmLinkTerminalData;
-        private  FarmLinkTerminalData? _farmLinkTerminalData;
+        internal FarmLinkTerminalData? FarmLinkTerminalData => farmLinkTerminalData;
+        private  FarmLinkTerminalData? farmLinkTerminalData;
 
         /// <summary>The key for the Farmlink Terminal Save Data.</summary>
         private const string FarmLinkTerminalDataKey = "farmlink-terminal-data";
@@ -48,17 +52,18 @@ namespace UltimateStorageSystem
         const int RecurseThreshold = 5;
 
         /// <summary>The custom basket texture.</summary>
-        internal static Texture2D BasketTexture => _basketTexture ??= Instance.Helper.ModContent.Load<Texture2D>("Assets/basket.png");
-        private  static Texture2D? _basketTexture;
+        internal static Texture2D BasketTexture => basketTexture ??= Instance.Helper.ModContent.Load<Texture2D>("Assets/basket.png");
+        private  static Texture2D? basketTexture;
 
         /// <summary>The instance of the mod config.</summary>
         private ModConfig config = null!;
 
         /// <summary>The instance of the mod logger class.</summary>
-        private Logger _logger = null!;
+        private Logger logger = null!;
 
         /// <summary>The name of the farm link terminal object.</summary>
         private const string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
+        internal static string FarmLinkTerminalName => farmLinkTerminalName; // Required for the patch.
 
         /// <summary>Determines if the next mouse/controller right click is ignored.</summary>
         internal bool IgnoreNextRightClick { get; set; } = true;
@@ -72,14 +77,18 @@ namespace UltimateStorageSystem
         {
             I18n.Init(helper.Translation);
             ModXmlTypeConstructorAttribute.Init(this.ModManifest);
-            this._logger = new(this.Monitor);
+            this.logger = new(this.Monitor);
             this.config  = helper.ReadConfig<ModConfig>();
 
             // // Initiales Laden der Konfiguration aus der config.json
             // LoadConfig();
 
             // Laden der Texturen aus dem Assets Ordner
-            _basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
+            basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
+
+            // Patch all harmony patches.
+            Harmony harmony = new Harmony("holybananapants.UltimateStorageSystem");
+            harmony.PatchAll();
 
             helper.Events.Input.ButtonPressed     += OnButtonPressed;
             helper.Events.World.ObjectListChanged += OnObjectListChanged;
@@ -91,18 +100,19 @@ namespace UltimateStorageSystem
             helper.Events.GameLoop.Saved          += OnSaved;
         }
 
-        //private void LoadConfig()
-        //{
+        /* Unused now. */
+        // private void LoadConfig()
+        // {
         //    try
         //    {
         //        config = Helper.ReadConfig<ModConfig>();
-        //
+
         //        // Versuche, den Hotkey zu parsen
         //        if (string.IsNullOrWhiteSpace(config.OpenFarmLinkTerminalHotkey) ||
         //            !Enum.TryParse(config.OpenFarmLinkTerminalHotkey.ToUpper(), true, out SButton parsedHotkey))
         //        {
         //            openTerminalHotkey = null;
-        //
+
         //            // Hinweis anzeigen, wenn kein Hotkey gesetzt ist
         //            Monitor.Log("No hotkey is set for opening the FarmLink Terminal. You can set a hotkey in the config.json file located in the mod folder if desired.", LogLevel.Info);
         //        }
@@ -115,7 +125,7 @@ namespace UltimateStorageSystem
         //    {
         //        openTerminalHotkey = null;  // Falls ein Fehler auftritt, setzen Sie den Hotkey auf null
         //    }
-        //}
+        // }
 
         private void InitFarmLinkTerminalData(int recurseStep = 0)
         {
@@ -158,8 +168,8 @@ namespace UltimateStorageSystem
         {
             if (Context.IsMainPlayer)
             {
-                _farmLinkTerminalData = LoadFarmLinkTerminalDataImpl();
-                if (_farmLinkTerminalData is null)
+                farmLinkTerminalData = LoadFarmLinkTerminalDataImpl();
+                if (farmLinkTerminalData is null)
                 {
                     Logger.Error("Failed to load the FarmLink Terminal Data, will create a new one.");
                     InitFarmLinkTerminalData(recurseStep > 1 ? recurseStep + 1 : 1);
@@ -181,7 +191,7 @@ namespace UltimateStorageSystem
             GenericModConfigMenuIntegration.Register(
                 manifest: this.ModManifest,
                 modRegistry: this.Helper.ModRegistry,
-                monitor: this._logger,
+                monitor: this.logger,
                 getConfig: () => this.config,
                 reset: () => config = new(),
                 save: () => this.Helper.WriteConfig(this.config),
@@ -192,26 +202,29 @@ namespace UltimateStorageSystem
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            foreach (var location in Game1.locations)
-            {
-                CheckForFarmLinkTerminal(location);
-            }
+            /* Unused now. */
+            // foreach (var location in Game1.locations)
+            // {
+            //     CheckForFarmLinkTerminal(location);
+            // }
         }
 
         private void OnSaving(object? sender, SavingEventArgs e)
         {
-            foreach (var location in Game1.locations)
-            {
-                ConvertCustomWorkbenchesToStandard(location);
-            }
+            /* Unused now. */
+            // foreach (var location in Game1.locations)
+            // {
+            //     ConvertCustomWorkbenchesToStandard(location);
+            // }
         }
 
         private void OnSaved(object? sender, SavedEventArgs e)
         {
-            foreach (var location in Game1.locations)
-            {
-                CheckForFarmLinkTerminal(location);
-            }
+            /* Unused now. */
+            // foreach (var location in Game1.locations)
+            // {
+            //     CheckForFarmLinkTerminal(location);
+            // }
         }
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
@@ -242,7 +255,8 @@ namespace UltimateStorageSystem
 
         private void OnLocationChanged(object? sender, WarpedEventArgs e)
         {
-            CheckForFarmLinkTerminal(e.NewLocation);
+            /* Unused now. */
+            // CheckForFarmLinkTerminal(e.NewLocation);
         }
 
         private void OnObjectListChanged(object? sender, ObjectListChangedEventArgs e)
@@ -252,7 +266,8 @@ namespace UltimateStorageSystem
                 RevertCustomWorkbenches(e.Location);
             }
 
-            CheckForFarmLinkTerminal(e.Location);
+            /* Unused now. */
+            // CheckForFarmLinkTerminal(e.Location);
         }
 
         private bool IsFarmLinkTerminalPlaced()
@@ -272,41 +287,44 @@ namespace UltimateStorageSystem
             return false;
         }
 
-        private void CheckForFarmLinkTerminal(GameLocation location)
-        {
-            List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = [];
+        /* Unused now. */
+        // private void CheckForFarmLinkTerminal(GameLocation location)
+        // {
+        //     List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = [];
 
-            foreach (var pair in location.objects.Pairs)
-            {
-                if (pair.Value is Workbench workbench && pair.Value is not CustomWorkbench)
-                {
-                    if (IsTerminalAdjacent(pair.Key, location))
-                    {
-                        workbenchesToReplace.Add(new KeyValuePair<Vector2, Workbench>(pair.Key, workbench));
-                    }
-                }
-            }
+        //     foreach (var pair in location.objects.Pairs)
+        //     {
+        //         if (pair.Value is Workbench workbench && pair.Value is not CustomWorkbench)
+        //         {
+        //             if (IsTerminalAdjacent(pair.Key, location))
+        //             {
+        //                 workbenchesToReplace.Add(new KeyValuePair<Vector2, Workbench>(pair.Key, workbench));
+        //             }
+        //         }
+        //     }
 
-            foreach (var pair in workbenchesToReplace)
-            {
-                location.objects.Remove(pair.Key);
-                location.objects.Add(pair.Key, new CustomWorkbench(pair.Key));
-            }
-        }
+        //     foreach (var pair in workbenchesToReplace)
+        //     {
+        //         location.objects.Remove(pair.Key);
+        //         location.objects.Add(pair.Key, new CustomWorkbench(pair.Key));
+        //     }
+        // }
 
-        private bool IsTerminalAdjacent(Vector2 tileLocation, GameLocation location)
-        {
-            foreach (var offset in AdjacentTilesOffsets)
-            {
-                Vector2 adjacentTile = tileLocation + offset;
-                if (location.objects.TryGetValue(adjacentTile, out StardewValley.Object adjacentObject) && adjacentObject.Name == farmLinkTerminalName)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        /* Unused now. */
+        // private bool IsTerminalAdjacent(Vector2 tileLocation, GameLocation location)
+        // {
+        //     foreach (var offset in AdjacentTilesOffsets)
+        //     {
+        //         Vector2 adjacentTile = tileLocation + offset;
+        //         if (location.objects.TryGetValue(adjacentTile, out StardewValley.Object adjacentObject) && adjacentObject.Name == farmLinkTerminalName)
+        //         {
+        //             return true;
+        //         }
+        //     }
+        //     return false;
+        // }
 
+        // Still use this to unpatch ny CustomWorkbenches if required.
         private void RevertCustomWorkbenches(GameLocation location)
         {
             List<Vector2> customWorkbenchesToRevert = [];
@@ -326,24 +344,25 @@ namespace UltimateStorageSystem
             }
         }
 
-        private void ConvertCustomWorkbenchesToStandard(GameLocation location)
-        {
-            List<Vector2> customWorkbenchesToRevert = [];
+        /* Unused now. */
+        // private void ConvertCustomWorkbenchesToStandard(GameLocation location)
+        // {
+        //     List<Vector2> customWorkbenchesToRevert = [];
 
-            foreach (var pair in location.objects.Pairs)
-            {
-                if (pair.Value is CustomWorkbench)
-                {
-                    customWorkbenchesToRevert.Add(pair.Key);
-                }
-            }
+        //     foreach (var pair in location.objects.Pairs)
+        //     {
+        //         if (pair.Value is CustomWorkbench)
+        //         {
+        //             customWorkbenchesToRevert.Add(pair.Key);
+        //         }
+        //     }
 
-            foreach (var tileLocation in customWorkbenchesToRevert)
-            {
-                location.objects.Remove(tileLocation);
-                location.objects.Add(tileLocation, new Workbench(tileLocation));
-            }
-        }
+        //     foreach (var tileLocation in customWorkbenchesToRevert)
+        //     {
+        //         location.objects.Remove(tileLocation);
+        //         location.objects.Add(tileLocation, new Workbench(tileLocation));
+        //     }
+        // }
 
         private bool IsFarmLinkTerminalOnTile(Vector2 tile, out StardewValley.Object terminalObject)
         {
