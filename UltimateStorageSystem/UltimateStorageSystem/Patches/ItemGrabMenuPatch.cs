@@ -95,7 +95,7 @@ namespace UltimateStorageSystem.Patches
                 if (found2 && !patched)
                 {
                     yield return new CodeInstruction(OpCodes.Ldarg_0);
-                    yield return new CodeInstruction(OpCodes.Ldarga_S, 14);
+                    yield return new CodeInstruction(OpCodes.Ldarg_S, 14);
                     yield return new CodeInstruction(OpCodes.Call,     m_PatchedMethod);
                     patched     = true;
                 }

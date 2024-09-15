@@ -3,11 +3,12 @@
   "cSpell.dictionaries": [
     "companies"    , "softwareTerms", "misc"         , "powershell"   ,
     "csharp"       , "bash"         , "fonts"        , "filetypes"    ,
-    "stardew"
+    "stardew"      , "programming"  ,
   ],
   "cSpell.words": [
     "holybananapants",  // Author's name.
-    "parsen"            // Missing german word in dictionary.
+    "parsen",           // Missing german word in dictionary.
+    "FarmLink",
   ],
   "cSpell.enabledLanguageIds": [
     "asciidoc"        , "c"               , "cpp"             ,
@@ -23,6 +24,6 @@
     "scss"            , "scminput"        , "swift"           ,
     "text"            , "typescript"      , "typescriptreact" ,
     "vue"             , "yaml"            , "yml"             ,
-    "COBOL"           , "ACUCOBOL"
+    "COBOL"           , "ACUCOBOL"        ,
   ]
 }

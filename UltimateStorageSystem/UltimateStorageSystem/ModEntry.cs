@@ -62,8 +62,8 @@ namespace UltimateStorageSystem
         private Logger logger = null!;
 
         /// <summary>The name of the farm link terminal object.</summary>
-        private const string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
         internal static string FarmLinkTerminalName => farmLinkTerminalName; // Required for the patch.
+        private const string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
 
         /// <summary>Determines if the next mouse/controller right click is ignored.</summary>
         internal bool IgnoreNextRightClick { get; set; } = true;
@@ -139,10 +139,6 @@ namespace UltimateStorageSystem
                 Instance.Helper.Data.WriteSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey, new());
                 LoadFarmLinkTerminalData();
             }
-            else
-            {
-                Logger.Warn("Tried to Initialize the FarmLink Terminal Data, via a remote client, ignoring.");
-            }
         }
 
         internal void SaveFarmLinkTerminalData(FarmLinkTerminalData? data)
@@ -155,10 +151,6 @@ namespace UltimateStorageSystem
             if (Context.IsMainPlayer)
             {
                 return Instance.Helper.Data.ReadSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey);
-            }
-            else
-            {
-                Logger.Warn("Tried to load the FarmLink Terminal Data, via a remote client, ignoring.");
             }
 
             return null;
@@ -174,10 +166,6 @@ namespace UltimateStorageSystem
                     Logger.Error("Failed to load the FarmLink Terminal Data, will create a new one.");
                     InitFarmLinkTerminalData(recurseStep > 1 ? recurseStep + 1 : 1);
                 }
-            }
-            else
-            {
-                Logger.Warn("Tried to load the FarmLink Terminal Data, via a remote client, ignoring.");
             }
         }
 
@@ -377,52 +365,47 @@ namespace UltimateStorageSystem
             Game1.activeClickableMenu = new FarmLinkTerminalMenu(GetAllChests());
         }
 
+        internal static void AddChestsFromLocation(GameLocation location, ref List<Chest> chestList)
+        {
+            // Alle Objekte in der Location durchsuchen
+            chestList.AddRange(location.objects.Values.Cast<Chest>().Where(chest => chest.SpecialChestType is Chest.SpecialChestTypes.None or Chest.SpecialChestTypes.BigChest));
+
+            // Kühlschrank im Farmhaus prüfen
+            if (location is FarmHouse farmHouse && farmHouse.fridge.Value is Chest fridge)
+            {
+                chestList.Add(fridge);
+            }
+
+            // Gebäude in spezifischen Locations durchsuchen
+            if (location is Farm || location.Name == "FarmHouse" || location.Name == "Shed" || location.Name.Contains("Cabin"))
+            {
+
+                if (location is Farm farm)
+                {
+                    ModEntry.Instance.Monitor.Log($"location is typeof of farm and the name of the location is \"{location.Name}\".");
+                    foreach (var building in farm.buildings)
+                    {
+                        if (building.indoors.Value != null)
+                        {
+                            ModEntry.AddChestsFromLocation(building.indoors.Value, ref chestList);
+                        }
+                    }
+                }
+                else
+                {
+                    ModEntry.Instance.Monitor.Log($"location is not typeof of farm and the name of the location is \"{location.Name}\".");
+                }
+            }
+        }
+
         private List<Chest> GetAllChests()
         {
             List<Chest> chests = [];
 
-            void AddChestsFromLocation(GameLocation location)
-            {
-                // Alle Objekte in der Location durchsuchen
-                foreach (var item in location.objects.Values)
-                {
-                    if (item is Chest chest &&
-                        (chest.SpecialChestType == Chest.SpecialChestTypes.None || chest.SpecialChestType == Chest.SpecialChestTypes.BigChest))
-                    {
-                        chests.Add(chest);
-                    }
-                }
-
-                // Kühlschrank im Farmhaus prüfen
-                if (location is FarmHouse farmHouse)
-                {
-                    Chest fridge =farmHouse.fridge.Value;
-                    if (fridge is not null)
-                    {
-                        chests.Add(fridge);
-                    }
-                }
-
-                // Gebäude in spezifischen Locations durchsuchen
-                if (location is Farm || location.Name == "FarmHouse" || location.Name == "Shed" || location.Name.Contains("Cabin"))
-                {
-                    if (location is Farm farm)
-                    {
-                        foreach (var building in farm.buildings)
-                        {
-                            if (building.indoors.Value is not null)
-                            {
-                                AddChestsFromLocation(building.indoors.Value);
-                            }
-                        }
-                    }
-                }
-            }
-
             // Durchlaufe alle Locations im Spiel
             foreach (var location in Game1.locations)
             {
-                AddChestsFromLocation(location);
+                AddChestsFromLocation(location, ref chests);
             }
 
             return chests;

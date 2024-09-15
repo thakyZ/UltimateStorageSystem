@@ -32,6 +32,7 @@ namespace UltimateStorageSystem.Patches
         }
 
         // Overrides the method called when the player interacts with the workbench
+        [SuppressMessage("Roslynator", "RCS1163")]
         public static bool Prefix(Workbench __instance, ref bool __result, Farmer who, bool justCheckingForActivity /* = false */) {
             GameLocation location = __instance.Location;
             if (location == null) {
@@ -44,60 +45,19 @@ namespace UltimateStorageSystem.Patches
             }
             if (IsTerminalAdjacent(__instance.TileLocation, location)) {
                 // Creates a list of all chests found
-                List<Chest> chestList = new List<Chest>();
-
-                void AddChestsFromLocation(GameLocation location)
-                {
-                    // Alle Objekte in der Location durchsuchen
-                    foreach (var item in location.objects.Values)
-                    {
-                        if (item is Chest chest &&
-                            (chest.SpecialChestType == Chest.SpecialChestTypes.None || chest.SpecialChestType == Chest.SpecialChestTypes.BigChest))
-                        {
-                            chestList.Add(chest);
-                        }
-                    }
-
-                    // Kühlschrank im Farmhaus prüfen
-                    if (location is FarmHouse farmHouse)
-                    {
-                        Chest fridge = farmHouse.fridge.Value;
-                        if (fridge != null)
-                        {
-                            chestList.Add(fridge);
-                        }
-                    }
-
-                    // Gebäude in spezifischen Locations durchsuchen
-                    if (location is Farm || location.Name == "FarmHouse" || location.Name == "Shed" || location.Name.Contains("Cabin"))
-                    {
-                        if (location is Farm farm)
-                        {
-                            foreach (var building in farm.buildings)
-                            {
-                                if (building.indoors.Value != null)
-                                {
-                                    AddChestsFromLocation(building.indoors.Value);
-                                }
-                            }
-                        }
-                    }
-                }
+                List<Chest> chestList = [];
 
                 // Durchlaufe alle Locations im Spiel
                 foreach (var gameLocation in Game1.locations)
                 {
-                    AddChestsFromLocation(gameLocation);
+                    ModEntry.AddChestsFromLocation(gameLocation, ref chestList);
                 }
 
                 // Creates a list for the inventories of the found chests
-                List<IInventory> inventories = new List<IInventory>();
+                List<IInventory> inventories = [];
 
-                foreach (Chest chest in chestList)
-                {
-                    // Adds the chest's inventory to the inventory list
-                    inventories.Add((IInventory)chest.Items);
-                }
+                // Adds the chest's inventory to the inventory list
+                inventories.AddRange(chestList.Select(chest => (IInventory)chest.Items));
 
                 // If the global chest lock is not set, executes the following logic
                 if (!__instance.mutex.IsLocked())
@@ -106,9 +66,9 @@ namespace UltimateStorageSystem.Patches
                     __instance.mutex.RequestLock(() =>
                     {
                         // Centers the crafting menu on the screen
-                        Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2);
+                        Vector2 centeringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(800 + (IClickableMenu.borderWidth * 2), 600 + (IClickableMenu.borderWidth * 2));
                         // Opens the crafting menu with the collected inventories
-                        Game1.activeClickableMenu = new CraftingPage((int)centeringOnScreen.X, (int)centeringOnScreen.Y, 800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2, standaloneMenu: true, materialContainers: inventories);
+                        Game1.activeClickableMenu = new CraftingPage((int)centeringOnScreen.X, (int)centeringOnScreen.Y, 800 + (IClickableMenu.borderWidth * 2), 600 + (IClickableMenu.borderWidth * 2), standaloneMenu: true, materialContainers: inventories);
                         // Sets a function to execute when the menu is closed
                         Game1.activeClickableMenu.exitFunction = () =>
                         {
