@@ -1,21 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
 using StardewValley.Objects;
 using HarmonyLib;
 using StardewValley.Menus;
-using UltimateStorageSystem.Utilities;
-using StardewValley.Minigames;
-using static HarmonyLib.Code;
-using Microsoft.Xna.Framework;
-using UltimateStorageSystem.Utilities.Extensions;
 using UltimateStorageSystem.Tools;
 
 namespace UltimateStorageSystem.Patches
@@ -258,8 +246,7 @@ namespace UltimateStorageSystem.Patches
 
         internal static bool ShouldShowChestBlacklistIcon()
         {
-            // TODO: check if a single farm terminal is on the farm.
-            return true;
+            return ModEntry.IsFarmLinkTerminalPlaced();
         }
 
         internal static void PatchedDrawMethod(ItemGrabMenu __instance, SpriteBatch b)
@@ -278,21 +265,21 @@ namespace UltimateStorageSystem.Patches
 
             Exception? xPosException = null, widthException = null, yPosException = null, heightException = null;
 
-            if (ShouldShowChestBlacklistIcon()                                              &&
+            if (ShouldShowChestBlacklistIcon() &&
                 f_xPositionOnScreen.TryGetValue(__instance, out int xPositionOnScreen, out xPosException) &&
                 f_width.TryGetValue(__instance, out int width, out widthException)                        &&
                 f_yPositionOnScreen.TryGetValue(__instance, out int yPositionOnScreen, out yPosException) &&
                 f_height.TryGetValue(__instance, out int height, out heightException))
             {
                 chestBlacklistButton ??= new ClickableTextureComponent(
-                    name: "",
-                    bounds: new Rectangle(xPositionOnScreen + width, yPositionOnScreen + (height / 3) - 64 + -216, 64, 64).MoveHorizontal(64 + 24),
-                    label: "",
-                    hoverText: I18n.Label_ChestBlacklistButton_Desc(),
-                    texture: Game1.mouseCursors,
-                    sourceRect: GetToggledOnOffOffet(__instance),
-                    scale: 4f,
-                    drawShadow: false)
+                name: nameof(chestBlacklistButton),
+                bounds: new Rectangle(xPositionOnScreen + width, yPositionOnScreen + (height / 3) - 64 + -216, 64, 64).MoveHorizontal(64 + 24),
+                label: "",
+                hoverText: I18n.Label_ChestBlacklistButton_Desc(),
+                texture: Game1.mouseCursors,
+                sourceRect: GetToggledOnOffOffet(__instance),
+                scale: 4f,
+                drawShadow: false)
                 {
                     myID           = 899,
                     leftNeighborID = 898,

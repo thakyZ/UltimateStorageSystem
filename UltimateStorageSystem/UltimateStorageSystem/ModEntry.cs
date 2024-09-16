@@ -78,10 +78,9 @@ namespace UltimateStorageSystem
             I18n.Init(helper.Translation);
             ModXmlTypeConstructorAttribute.Init(this.ModManifest);
             this.logger = new(this.Monitor);
-            this.config  = helper.ReadConfig<ModConfig>();
 
-            // // Initiales Laden der Konfiguration aus der config.json
-            // LoadConfig();
+            // Initiales Laden der Konfiguration aus der config.json
+            this.config  = helper.ReadConfig<ModConfig>();
 
             // Laden der Texturen aus dem Assets Ordner
             basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
@@ -142,19 +141,10 @@ namespace UltimateStorageSystem
         }
 
         internal void SaveFarmLinkTerminalData(FarmLinkTerminalData? data)
-        {
-            Instance.Helper.Data.WriteSaveData(FarmLinkTerminalDataKey, data);
-        }
+            => Instance.Helper.Data.WriteSaveData(FarmLinkTerminalDataKey, data);
 
         private FarmLinkTerminalData? LoadFarmLinkTerminalDataImpl()
-        {
-            if (Context.IsMainPlayer)
-            {
-                return Instance.Helper.Data.ReadSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey);
-            }
-
-            return null;
-        }
+            => Context.IsMainPlayer ? Instance.Helper.Data.ReadSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey) : null;
 
         internal void LoadFarmLinkTerminalData(int recurseStep = 1)
         {
@@ -170,9 +160,7 @@ namespace UltimateStorageSystem
         }
 
         private void OnDayStarted(object? sender, DayStartedEventArgs e)
-        {
-            LoadFarmLinkTerminalData();
-        }
+            => LoadFarmLinkTerminalData();
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
@@ -258,59 +246,47 @@ namespace UltimateStorageSystem
             // CheckForFarmLinkTerminal(e.Location);
         }
 
-        private bool IsFarmLinkTerminalPlaced()
-        {
+        internal static bool IsFarmLinkTerminalPlaced()
             // Prüfe im FarmHouse
-            if (Game1.locations.OfType<FarmHouse>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName)))
-            {
-                return true;
-            }
-
+         => Game1.locations.OfType<FarmHouse>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName)) ||
             // Prüfe auf der Farm
-            if (Game1.locations.OfType<Farm>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName)))
-            {
-                return true;
-            }
+            Game1.locations.OfType<Farm>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName));
 
+        /* Unused now. */
+        //private void CheckForFarmLinkTerminal(GameLocation location)
+        //{
+        //    List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = [];
+
+        //    foreach (var pair in location.objects.Pairs)
+        //    {
+        //        if (pair.Value is Workbench workbench && pair.Value is not CustomWorkbench)
+        //        {
+        //            if (IsTerminalAdjacent(pair.Key, location))
+        //            {
+        //                workbenchesToReplace.Add(new KeyValuePair<Vector2, Workbench>(pair.Key, workbench));
+        //            }
+        //        }
+        //    }
+
+        //    foreach (var pair in workbenchesToReplace)
+        //    {
+        //        location.objects.Remove(pair.Key);
+        //        location.objects.Add(pair.Key, new CustomWorkbench(pair.Key));
+        //    }
+        //}
+
+        internal static bool IsTerminalAdjacent(Vector2 tileLocation, GameLocation location)
+        {
+            foreach (var offset in AdjacentTilesOffsets)
+            {
+                Vector2 adjacentTile = tileLocation + offset;
+                if (location.objects.TryGetValue(adjacentTile, out StardewValley.Object adjacentObject) && adjacentObject.Name == farmLinkTerminalName)
+                {
+                    return true;
+                }
+            }
             return false;
         }
-
-        /* Unused now. */
-        // private void CheckForFarmLinkTerminal(GameLocation location)
-        // {
-        //     List<KeyValuePair<Vector2, Workbench>> workbenchesToReplace = [];
-
-        //     foreach (var pair in location.objects.Pairs)
-        //     {
-        //         if (pair.Value is Workbench workbench && pair.Value is not CustomWorkbench)
-        //         {
-        //             if (IsTerminalAdjacent(pair.Key, location))
-        //             {
-        //                 workbenchesToReplace.Add(new KeyValuePair<Vector2, Workbench>(pair.Key, workbench));
-        //             }
-        //         }
-        //     }
-
-        //     foreach (var pair in workbenchesToReplace)
-        //     {
-        //         location.objects.Remove(pair.Key);
-        //         location.objects.Add(pair.Key, new CustomWorkbench(pair.Key));
-        //     }
-        // }
-
-        /* Unused now. */
-        // private bool IsTerminalAdjacent(Vector2 tileLocation, GameLocation location)
-        // {
-        //     foreach (var offset in AdjacentTilesOffsets)
-        //     {
-        //         Vector2 adjacentTile = tileLocation + offset;
-        //         if (location.objects.TryGetValue(adjacentTile, out StardewValley.Object adjacentObject) && adjacentObject.Name == farmLinkTerminalName)
-        //         {
-        //             return true;
-        //         }
-        //     }
-        //     return false;
-        // }
 
         // Still use this to unpatch ny CustomWorkbenches if required.
         private void RevertCustomWorkbenches(GameLocation location)
@@ -333,24 +309,24 @@ namespace UltimateStorageSystem
         }
 
         /* Unused now. */
-        // private void ConvertCustomWorkbenchesToStandard(GameLocation location)
-        // {
-        //     List<Vector2> customWorkbenchesToRevert = [];
+        //private void ConvertCustomWorkbenchesToStandard(GameLocation location)
+        //{
+        //    List<Vector2> customWorkbenchesToRevert = [];
 
-        //     foreach (var pair in location.objects.Pairs)
-        //     {
-        //         if (pair.Value is CustomWorkbench)
-        //         {
-        //             customWorkbenchesToRevert.Add(pair.Key);
-        //         }
-        //     }
+        //    foreach (var pair in location.objects.Pairs)
+        //    {
+        //        if (pair.Value is CustomWorkbench)
+        //        {
+        //            customWorkbenchesToRevert.Add(pair.Key);
+        //        }
+        //    }
 
-        //     foreach (var tileLocation in customWorkbenchesToRevert)
-        //     {
-        //         location.objects.Remove(tileLocation);
-        //         location.objects.Add(tileLocation, new Workbench(tileLocation));
-        //     }
-        // }
+        //    foreach (var tileLocation in customWorkbenchesToRevert)
+        //    {
+        //        location.objects.Remove(tileLocation);
+        //        location.objects.Add(tileLocation, new Workbench(tileLocation));
+        //    }
+        //}
 
         private bool IsFarmLinkTerminalOnTile(Vector2 tile, out StardewValley.Object terminalObject)
         {
@@ -368,7 +344,7 @@ namespace UltimateStorageSystem
         internal static void AddChestsFromLocation(GameLocation location, ref List<Chest> chestList)
         {
             // Alle Objekte in der Location durchsuchen
-            chestList.AddRange(location.objects.Values.Cast<Chest>().Where(chest => chest.SpecialChestType is Chest.SpecialChestTypes.None or Chest.SpecialChestTypes.BigChest));
+            chestList.AddRange(location.objects.Values.OfType<Chest>().Where(chest => chest.SpecialChestType is Chest.SpecialChestTypes.None or Chest.SpecialChestTypes.BigChest));
 
             // Kühlschrank im Farmhaus prüfen
             if (location is FarmHouse farmHouse && farmHouse.fridge.Value is Chest fridge)

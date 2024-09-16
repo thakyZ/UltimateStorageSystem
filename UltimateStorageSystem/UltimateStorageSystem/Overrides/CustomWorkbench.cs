@@ -36,48 +36,10 @@ namespace UltimateStorageSystem.Overrides
             // Creates a list of all chests found
             List<Chest> chestList = [];
 
-            void AddChestsFromLocation(GameLocation location)
-            {
-                // Alle Objekte in der Location durchsuchen
-                foreach (var item in location.objects.Values)
-                {
-                    if (item is Chest chest &&
-                        (chest.SpecialChestType == Chest.SpecialChestTypes.None || chest.SpecialChestType == Chest.SpecialChestTypes.BigChest))
-                    {
-                        chestList.Add(chest);
-                    }
-                }
-
-                // Kühlschrank im Farmhaus prüfen
-                if (location is FarmHouse farmHouse)
-                {
-                    Chest fridge = farmHouse.fridge.Value;
-                    if (fridge is not null)
-                    {
-                        chestList.Add(fridge);
-                    }
-                }
-
-                // Gebäude in spezifischen Locations durchsuchen
-                if (location is Farm || location.Name == "FarmHouse" || location.Name == "Shed" || location.Name.Contains("Cabin"))
-                {
-                    if (location is Farm farm)
-                    {
-                        foreach (var building in farm.buildings)
-                        {
-                            if (building.indoors.Value is not null)
-                            {
-                                AddChestsFromLocation(building.indoors.Value);
-                            }
-                        }
-                    }
-                }
-            }
-
             // Durchlaufe alle Locations im Spiel
             foreach (var gameLocation in Game1.locations)
             {
-                AddChestsFromLocation(gameLocation);
+                ModEntry.AddChestsFromLocation(gameLocation, ref chestList);
             }
 
             // Creates a list for the inventories of the found chests
