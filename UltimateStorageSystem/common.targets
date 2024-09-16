@@ -1,21 +1,32 @@
 <Project>
 
   <PropertyGroup>
-    <SonarQubeExclude>True</SonarQubeExclude>
-    <ModZipPath>$(MSBuildProjectDirectory)\..\..\_releases</ModZipPath>
-    <EnableHarmony>True</EnableHarmony>
+    <ProjectDir>$(MSBuildProjectDirectory)\</ProjectDir>
+    <SolutionDir>$(MSBuildProjectDirectory)\..</SolutionDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SonarQubeExclude>true</SonarQubeExclude>
+    <ModZipPath>$(ProjectDir)..\..\_releases</ModZipPath>
+    <GamePath>E:\SteamLibrary\SteamApps\common\Stardew Valley</GamePath>
+    <ModFolderName>$(TargetName)</ModFolderName>
+    <EnableHarmony>true</EnableHarmony>
+    <EnableModZip>true</EnableModZip>
+    <EnableModDeploy>true</EnableModDeploy>
+    <EnableGameDebugging>true</EnableGameDebugging>
+    <BundleExtraAssemblies></BundleExtraAssemblies>
+    <IgnoreModFilePaths>$(TargetName).deps.json</IgnoreModFilePaths>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.2.0" />
   </ItemGroup>
 
-  <Target Name="BeforeCoreBuild" BeforeTargets="CoreCompile" DependsOnTargets="PrepareForBuild">
-    <Exec Command="powershell -Command '&amp; &quot;$(MSBuildProjectDirectory)\..\..\scripts\Compile.ps1&quot; -PreBuild'" />
-  </Target>
-
-  <Target Name="AfterBuild" AfterTargets="Build">
-    <Exec Command="powershell -Command '&amp; &quot;$(MSBuildProjectDirectory)\..\..\scripts\Compile.ps1&quot; -PostBuild'" />
-  </Target>
+  <ItemGroup>
+    <!--Link="[CP] UltimateStorageSystem" TargetPath="$(SolutionDir)..\[CP] UltimateStorageSystem"-->
+    <ContentPacks Include="$(SolutionDir)..\UltimateStorageSystemContentPack" Version="$(Version)" />
+    <Content      Include="$(ProjectDir)Assets\**" Link="Assets\%(RecursiveDir)\%(Filename)%(Extension)" TargetPath="Assets\%(RecursiveDir)\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content      Include="$(ProjectDir)i18n\**"   Link="i18n\%(RecursiveDir)\%(Filename)%(Extension)"   TargetPath="i18n\%(RecursiveDir)\%(Filename)%(Extension)"   CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>
