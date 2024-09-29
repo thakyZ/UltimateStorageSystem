@@ -1,23 +1,20 @@
-﻿using Microsoft.Xna.Framework;
-using StardewValley;
-
-namespace UltimateStorageSystem.Tools
+﻿namespace UltimateStorageSystem.Tools
 {
-    internal static class FarmlinkChestManager
+    internal static class FarmLinkChestManager
     {
-        internal static bool HasChestInBlacklistForLocation(GameLocation location, Vector2 tileLocation)
+        internal static bool HasChestInFilterForLocation(GameLocation location, Vector2 tileLocation)
         {
-            return ModEntry.Instance.FarmLinkTerminalData?.HasChestInBlacklistForLocation(location, tileLocation) == true;
+            return ModEntry.Instance.FarmLinkTerminalData?.HasChestInFilterForLocation(location, tileLocation) == true;
         }
 
-        internal static void AddChestInBlacklistForLocation(GameLocation location, Vector2 tileLocation)
+        internal static void AddChestInFilterForLocation(GameLocation location, Vector2 tileLocation)
         {
-            ModEntry.Instance.FarmLinkTerminalData?.AddChestInBlacklistForLocation(location, tileLocation);
+            ModEntry.Instance.FarmLinkTerminalData?.AddChestInFilterForLocation(location, tileLocation);
         }
 
-        internal static void RemoveChestInBlacklistForLocation(GameLocation location, Vector2 tileLocation)
+        internal static void RemoveChestInFilterForLocation(GameLocation location, Vector2 tileLocation)
         {
-            ModEntry.Instance.FarmLinkTerminalData?.RemoveChestInBlacklistForLocation(location, tileLocation);
+            ModEntry.Instance.FarmLinkTerminalData?.RemoveChestInFilterForLocation(location, tileLocation);
         }
     }
 }

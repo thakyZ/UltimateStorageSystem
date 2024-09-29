@@ -1,5 +1,7 @@
 ﻿using GenericModConfigMenu;
 
+using UltimateStorageSystem.Network;
+
 namespace UltimateStorageSystem.Integrations.GenericModConfigMenu
 {
     internal static class GenericModConfigMenuIntegration
@@ -34,6 +36,14 @@ namespace UltimateStorageSystem.Integrations.GenericModConfigMenu
                            tooltip: I18n.Config_OpenFarmLinkTerminalHotkey_Desc,
                            getValue: () => getConfig().OpenFarmLinkTerminalHotkey,
                            setValue: value => getConfig().OpenFarmLinkTerminalHotkey = value);
+            api.AddBoolOption(mod: manifest,
+                              name: I18n.Config_UseWhitelist_Name,
+                              tooltip: I18n.Config_UseWhitelist_Desc,
+                              getValue: () => getConfig().UseWhiteList,
+                              setValue: value => {
+                                  getConfig().UseWhiteList = value;
+                                  MessageManager.SendConfigUpdate(Game1.player, getConfig());
+                              });
         }
     }
 }

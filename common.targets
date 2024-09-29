@@ -1,20 +1,19 @@
 <Project>
 
   <PropertyGroup>
-    <ProjectDir>$(MSBuildProjectDirectory)\</ProjectDir>
-    <SolutionDir>$(MSBuildProjectDirectory)\..</SolutionDir>
+    <ProjectDir Condition="'$(ProjectDir)' == ''">$(MSBuildProjectDirectory)\</ProjectDir>
+    <SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildProjectDirectory)\..</SolutionDir>
   </PropertyGroup>
 
   <PropertyGroup>
     <SonarQubeExclude>true</SonarQubeExclude>
-    <ModZipPath>$(ProjectDir)..\..\_releases</ModZipPath>
-    <GamePath>E:\SteamLibrary\SteamApps\common\Stardew Valley</GamePath>
+    <ModZipPath>$(SolutionDir)_releases</ModZipPath>
     <ModFolderName>$(TargetName)</ModFolderName>
+    <DeployToModOrganizer2>true</DeployToModOrganizer2>
+    <DeployToMO2>true</DeployToMO2>
     <EnableHarmony>true</EnableHarmony>
     <EnableModZip>true</EnableModZip>
-    <EnableModDeploy>true</EnableModDeploy>
     <EnableGameDebugging>true</EnableGameDebugging>
-    <BundleExtraAssemblies></BundleExtraAssemblies>
     <IgnoreModFilePaths>$(TargetName).deps.json</IgnoreModFilePaths>
   </PropertyGroup>
 
@@ -23,10 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--Link="[CP] UltimateStorageSystem" TargetPath="$(SolutionDir)..\[CP] UltimateStorageSystem"-->
-    <ContentPacks Include="$(SolutionDir)..\UltimateStorageSystemContentPack" Version="$(Version)" />
-    <Content      Include="$(ProjectDir)Assets\**" Link="Assets\%(RecursiveDir)\%(Filename)%(Extension)" TargetPath="Assets\%(RecursiveDir)\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
-    <Content      Include="$(ProjectDir)i18n\**"   Link="i18n\%(RecursiveDir)\%(Filename)%(Extension)"   TargetPath="i18n\%(RecursiveDir)\%(Filename)%(Extension)"   CopyToOutputDirectory="PreserveNewest" />
+    <ContentPacks Include="..\UltimateStorageSystemContentPack" FolderName="[CP] UltimateStorageSystem" Version="$(Version)" />
+    <Content Include="$(ProjectDir)Assets\**" Link="Assets\%(RecursiveDir)\%(Filename)%(Extension)" TargetPath="Assets\%(RecursiveDir)\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(ProjectDir)i18n\**"   Link="i18n\%(RecursiveDir)\%(Filename)%(Extension)"   TargetPath="i18n\%(RecursiveDir)\%(Filename)%(Extension)"   CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <Target BeforeTargets="CoreCompile" Name="BeforeCoreCompile">
+    <Message Text="ContentPacks = @(ContentPacks)" Importance="High" />
+  </Target>
 
 </Project>

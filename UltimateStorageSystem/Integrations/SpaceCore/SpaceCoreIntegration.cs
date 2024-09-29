@@ -7,9 +7,9 @@ namespace UltimateStorageSystem.Integrations.SpaceCore
     /// </summary>
     internal sealed class SpaceCoreIntegration
     {
-        private static SpaceCoreIntegration? _instance;
-        private        ISpaceCoreApi?        api;
-        public static  bool                  Initialized => _instance?.api is not null;
+        private static   SpaceCoreIntegration? _instance;
+        private readonly ISpaceCoreApi?        api;
+        public static    bool                  Initialized => _instance?.api is not null;
 
         private SpaceCoreIntegration(IModRegistry modRegistry, IMonitor monitor)
         {

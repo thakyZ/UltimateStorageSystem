@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Monsters;
 
+#region Api File
 namespace SpaceCore
 {
     /// <summary>
@@ -50,8 +51,8 @@ namespace SpaceCore
         /// <summary>
         /// Get a list of all the skills with the ID, current xp value in them, and current level
         /// </summary>
-        /// <param name="farmer"> The farmer you want the list for</param>
-        /// <returns>List<Tuple<skill, XP value, Level>></returns>
+        /// <param name="farmer">The farmer you want the list for</param>
+        /// <returns>List&lt;Tuple&lt;Skill, XP value, Level&gt;&gt;</returns>
         List<Tuple<string, int, int>> GetExperienceAndLevelsForCustomSkill(Farmer farmer);
 
         /// <summary>
@@ -104,10 +105,10 @@ namespace SpaceCore
 
         public event EventHandler<Action<string, Action>> AdvancedInteractionStarted;
 
-        public List<string> GetVirtualCurrencyList();
-        public bool IsVirtualCurrencyTeamWide(string currency);
-        public int GetVirtualCurrencyAmount(Farmer who, string currency);
-        public void AddToVirtualCurrency(Farmer who, string currency, int amount); // supports negative numbers
+        // public List<string> GetVirtualCurrencyList();
+        // public bool IsVirtualCurrencyTeamWide(string currency);
+        // public int GetVirtualCurrencyAmount(Farmer who, string currency);
+        // public void AddToVirtualCurrency(Farmer who, string currency, int amount); // supports negative numbers
 
         public void RegisterEquipmentSlot(IManifest modManifest, string globalId, Func<Item, bool> slotValidator, Func<string> slotDisplayName, Texture2D bgTex, Rectangle? bgRect = null);
         public Item GetItemInEquipmentSlot(Farmer farmer, string globalId);
@@ -115,3 +116,4 @@ namespace SpaceCore
         public bool CanItemGoInEquipmentSlot(string globalId, Item item);
     }
 }
+#endregion

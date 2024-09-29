@@ -5,17 +5,18 @@
 
 namespace UltimateStorageSystem.Utilities
 {
-    // Represents an entry of an item with name, quantity, single value, total value, and the associated item object.
+    /// <summary>Represents an entry of an item with name, quantity, single value, total value, and the associated item object.</summary>
     public class ItemEntry
     {
         // Properties of the ItemEntry
-        public string Name        { get; set; }
+        public string Name        { get; }
         public int    Quantity    { get; set; }
-        public int    SingleValue { get; set; }
+        public int    SingleValue { get; }
         public int    TotalValue  { get; set; }
-        public Item?  Item        { get; set; } // Field for the associated item
+        /// <summary>Field for the associated item</summary>
+        public Item?  Item        { get; }
 
-        // Constructor to initialize an ItemEntry object.
+        /// <summary>Constructor to initialize an ItemEntry object.</summary>
         public ItemEntry(string name, int quantity, int singleValue, int totalValue, Item? item = null)
         {
             Name = name;

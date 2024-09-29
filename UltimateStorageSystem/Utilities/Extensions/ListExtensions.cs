@@ -2,19 +2,20 @@
 {
     internal static class ListExtensions
     {
-        public static void RemoveWhere<TSource>(this List<TSource> list, Predicate<TSource> match)
+        public static void RemoveWhere<TSource>(this List<TSource> self, Predicate<TSource> match)
         {
-            for (int i = 0; i < list.Count; i++)
+            for (int i = self.Count - 1; i >= 0; i--)
             {
-                var item = list[i];
-
-                if (match.Invoke(item))
+                if (match(self[i]))
                 {
-                    list.RemoveAt(i);
+                    self.RemoveAt(i);
                 }
-
-                i--;
             }
+        }
+
+        public static IEnumerable<(int Index, TSource Item)> Iterate<TSource>(this List<TSource> self)
+        {
+            return self.Select((x, i) => (i, x));
         }
     }
 }

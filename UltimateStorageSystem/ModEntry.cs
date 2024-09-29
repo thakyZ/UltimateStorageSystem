@@ -1,25 +1,26 @@
-﻿using System.Linq;
-using System.IO;
-using System.Xml.Serialization;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using StardewModdingAPI.Events;
-using HarmonyLib;
 using UltimateStorageSystem.Drawing;
 using UltimateStorageSystem.Integrations.GenericModConfigMenu;
 using UltimateStorageSystem.Tools;
 using UltimateStorageSystem.Overrides;
 using UltimateStorageSystem.Integrations.SpaceCore;
+using UltimateStorageSystem.Network;
+using System.Threading;
+using System.Text;
 
 namespace UltimateStorageSystem
 {
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class ModEntry : Mod
     {
         /// <summary>Instance of the Mod for static methods.</summary>
         internal static ModEntry Instance { get; private set; } = null!;
 
         /// <summary>Adjacent tile offsets to the terminal to check.</summary>
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         internal static Vector2[] AdjacentTilesOffsets =>
         [
             new Vector2(-1f, 1f),
@@ -33,45 +34,53 @@ namespace UltimateStorageSystem
         ];
 
         /// <summary>Farmlink Terminal Data for blacklisting chests from the Farmlink Terminal.</summary>
-        internal FarmLinkTerminalData? FarmLinkTerminalData => farmLinkTerminalData;
-        private  FarmLinkTerminalData? farmLinkTerminalData;
+        internal FarmLinkTerminalData? FarmLinkTerminalData { get; private set; }
 
         /// <summary>The key for the Farmlink Terminal Save Data.</summary>
         private const string FarmLinkTerminalDataKey = "farmlink-terminal-data";
 
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         /// <summary>
         /// The button to open the farmlink terminal wirelessly.
+        /// </summary>
+        /// <remarks>Nullable SButton für den Hotkey</remarks>
         /// <remarks>
         /// TODO: Maybe make it locked behind an upgrade.
         /// </remarks>
-        /// <remarks>Nullable SButton für den Hotkey</remarks>
-        /// </summary>
         private SButton? OpenTerminalHotkey => config?.OpenFarmLinkTerminalHotkey ?? SButton.None;
 
         /// <summary>The threshold for recusive methods before throwing an error.</summary>
-        const int RecurseThreshold = 5;
+        private const int RecurseThreshold = 5;
 
         /// <summary>The custom basket texture.</summary>
-        internal static Texture2D BasketTexture => basketTexture ??= Instance.Helper.ModContent.Load<Texture2D>("Assets/basket.png");
-        private  static Texture2D? basketTexture;
+        internal static Texture2D? BasketTexture { get; private set; }
+
+        /// <summary>The blacklist/whitelist filter button texture.</summary>
+        internal static Texture2D? FilterButtonTexture { get; private set; }
 
         /// <summary>The instance of the mod config.</summary>
         private ModConfig config = null!;
+        private         bool HostHasUseWhitelist { get; set; }
+        internal static bool IsNotUsingWhitelist => Context.IsMainPlayer ? !Instance.config.UseWhiteList : !Instance.HostHasUseWhitelist;
+        internal static bool TraceLogging        => Instance.config.TraceLogging;
 
         /// <summary>The instance of the mod logger class.</summary>
         private Logger logger = null!;
 
         /// <summary>The name of the farm link terminal object.</summary>
-        internal static string FarmLinkTerminalName => farmLinkTerminalName; // Required for the patch.
-        private const string farmLinkTerminalName = "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
+        private static string FarmLinkTerminalName => "holybananapants.UltimateStorageSystemContentPack_FarmLinkTerminal";
 
         /// <summary>Determines if the next mouse/controller right click is ignored.</summary>
         internal bool IgnoreNextRightClick { get; set; } = true;
+
+        private static readonly CancellationTokenSource asyncRequestCancellationToken = new();
 
         public ModEntry()
         {
             Instance = this;
         }
+
+        public static string UltimateStorageSystemCommandDocumentation => "";
 
         public override void Entry(IModHelper helper)
         {
@@ -83,25 +92,80 @@ namespace UltimateStorageSystem
             this.config  = helper.ReadConfig<ModConfig>();
 
             // Laden der Texturen aus dem Assets Ordner
-            basketTexture = helper.ModContent.Load<Texture2D>("Assets/basket.png");
+            ModEntry.BasketTexture                = helper.ModContent.Load<Texture2D>("Assets/basket.png");
+            ModEntry.FilterButtonTexture = helper.ModContent.Load<Texture2D>("Assets/filter.png");
 
             // Patch all harmony patches.
             Harmony harmony = new Harmony("holybananapants.UltimateStorageSystem");
             harmony.PatchAll();
 
-            helper.Events.Input.ButtonPressed     += OnButtonPressed;
-            helper.Events.World.ObjectListChanged += OnObjectListChanged;
-            helper.Events.Player.Warped           += OnLocationChanged;
-            helper.Events.GameLoop.GameLaunched   += OnGameLaunched;
-            helper.Events.GameLoop.DayStarted     += OnDayStarted;
-            helper.Events.GameLoop.SaveLoaded     += OnSaveLoaded;
-            helper.Events.GameLoop.Saving         += OnSaving;
-            helper.Events.GameLoop.Saved          += OnSaved;
+            helper.ConsoleCommands.Add(nameof(UltimateStorageSystem).ToSnakeCase(), UltimateStorageSystemCommandDocumentation, this.OnCommand);
+            helper.Events.Input.ButtonPressed       += OnButtonPressed;
+            helper.Events.World.ObjectListChanged   += ModEntry.OnObjectListChanged;
+            helper.Events.Player.Warped             += OnLocationChanged;
+            helper.Events.GameLoop.GameLaunched     += OnGameLaunched;
+            helper.Events.GameLoop.DayStarted       += OnDayStarted;
+            helper.Events.GameLoop.SaveLoaded       += OnSaveLoaded;
+            helper.Events.GameLoop.Saving           += OnSaving;
+            helper.Events.GameLoop.Saved            += ModEntry.OnSaved;
+            helper.Events.GameLoop.ReturnedToTitle  += OnReturnedToTitle;
+            helper.Events.Multiplayer.PeerConnected += this.OnPeerConnected;
+        }
+
+        private void OnPeerConnected(object? sender, PeerConnectedEventArgs e)
+        {
+            MessageManager.SendConfigUpdate(Game1.player, this.config, e.Peer.PlayerID);
+        }
+
+        private void OnCommand(string command, string[] args)
+        {
+            if (!command.Equals(nameof(UltimateStorageSystem).ToSnakeCase()))
+            {
+                Logger.Warn($"Name of command is not {nameof(UltimateStorageSystem).ToSnakeCase()} got {command} instead.");
+                return;
+            }
+
+            switch (args[0].ToLower())
+            {
+                case "help" or "h":
+                    Logger.Info(UltimateStorageSystemCommandDocumentation);
+                    break;
+                case "find_chests" when Game1.player.currentLocation is { } location && (location is Farm || location.Name is "FarmHouse" or "Shed" || location.Name.Contains("Cabin")):
+                {
+                    var sb = new StringBuilder();
+                    var chests = GetAllChests();
+                    for (int i = 0; i < chests.Count; i++)
+                    {
+                        Chest? chest = chests[i];
+                        sb.Append('[')
+                          .Append(i)
+                          .Append("] ")
+                          .Append("Tile Position:")
+                          .Append(" { ")
+                          .Append(" X = ")
+                          .Append(chest.TileLocation.X)
+                          .Append(" Y = ")
+                          .Append(chest.TileLocation.Y)
+                          .Append(" } ")
+                          .Append("Location Name:")
+                          .Append(' ')
+                          .Append('"')
+                          .Append(chest.Location.Name)
+                          .Append('"')
+                          .AppendLine();
+                    }
+                    Logger.Info(sb.ToString());
+                    break;
+                }
+                default:
+                    Logger.Info("Unknown");
+                    break;
+            }
         }
 
         /* Unused now. */
-        // private void LoadConfig()
-        // {
+        //private void LoadConfig()
+        //{
         //    try
         //    {
         //        config = Helper.ReadConfig<ModConfig>();
@@ -124,7 +188,7 @@ namespace UltimateStorageSystem
         //    {
         //        openTerminalHotkey = null;  // Falls ein Fehler auftritt, setzen Sie den Hotkey auf null
         //    }
-        // }
+        //}
 
         private void InitFarmLinkTerminalData(int recurseStep = 0)
         {
@@ -135,43 +199,69 @@ namespace UltimateStorageSystem
 
             if (Context.IsMainPlayer)
             {
-                Instance.Helper.Data.WriteSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey, new());
+                Helper.Data.WriteSaveData(FarmLinkTerminalDataKey, FarmLinkTerminalData);
                 LoadFarmLinkTerminalData();
             }
         }
 
-        internal void SaveFarmLinkTerminalData(FarmLinkTerminalData? data)
-            => Instance.Helper.Data.WriteSaveData(FarmLinkTerminalDataKey, data);
+        private void SaveFarmLinkTerminalData(FarmLinkTerminalData? data)
+        {
+            Helper.Data.WriteSaveData(FarmLinkTerminalDataKey, data);
+        }
 
         private FarmLinkTerminalData? LoadFarmLinkTerminalDataImpl()
-            => Context.IsMainPlayer ? Instance.Helper.Data.ReadSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey) : null;
+        {
+            return Context.IsMainPlayer ? Helper.Data.ReadSaveData<FarmLinkTerminalData>(FarmLinkTerminalDataKey) : null;
+        }
 
-        internal void LoadFarmLinkTerminalData(int recurseStep = 1)
+        private void LoadFarmLinkTerminalData(int recurseStep = 1)
         {
             if (Context.IsMainPlayer)
             {
-                farmLinkTerminalData = LoadFarmLinkTerminalDataImpl();
-                if (farmLinkTerminalData is null)
+                FarmLinkTerminalData = LoadFarmLinkTerminalDataImpl();
+                if (FarmLinkTerminalData is null)
                 {
                     Logger.Error("Failed to load the FarmLink Terminal Data, will create a new one.");
                     InitFarmLinkTerminalData(recurseStep > 1 ? recurseStep + 1 : 1);
                 }
             }
+            else
+            {
+                MessageManager.SendDataRequest();
+            }
+        }
+
+        internal static void UpdateHostConfig(bool? useWhitelist)
+        {
+            if (useWhitelist is not null)
+                Instance.HostHasUseWhitelist = useWhitelist.Value;
+        }
+
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        private void OnReturnedToTitle(object? sender, ReturnedToTitleEventArgs e)
+        {
+            if (asyncRequestCancellationToken.Token.CanBeCanceled)
+            {
+                asyncRequestCancellationToken.Cancel();
+            }
+
         }
 
         private void OnDayStarted(object? sender, DayStartedEventArgs e)
-            => LoadFarmLinkTerminalData();
+        {
+            LoadFarmLinkTerminalData();
+        }
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
             GenericModConfigMenuIntegration.Register(
-                manifest: this.ModManifest,
-                modRegistry: this.Helper.ModRegistry,
-                monitor: this.logger,
-                getConfig: () => this.config,
-                reset: () => config = new(),
-                save: () => this.Helper.WriteConfig(this.config),
-                titleScreenOnly: false);
+            manifest: this.ModManifest,
+            modRegistry: this.Helper.ModRegistry,
+            monitor: this.logger,
+            getConfig: () => this.config,
+            reset: () => config = new(),
+            save: () => this.Helper.WriteConfig(this.config),
+            titleScreenOnly: false);
             SpaceCoreIntegration.Init(this.Helper.ModRegistry, this.Monitor);
             SpaceCoreIntegration.RegisterSerializerTypes();
         }
@@ -179,28 +269,29 @@ namespace UltimateStorageSystem
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
             /* Unused now. */
-            // foreach (var location in Game1.locations)
-            // {
-            //     CheckForFarmLinkTerminal(location);
-            // }
+            //foreach (var location in Game1.locations)
+            //{
+            //    CheckForFarmLinkTerminal(location);
+            //}
         }
 
         private void OnSaving(object? sender, SavingEventArgs e)
         {
+            SaveFarmLinkTerminalData(FarmLinkTerminalData);
             /* Unused now. */
-            // foreach (var location in Game1.locations)
-            // {
-            //     ConvertCustomWorkbenchesToStandard(location);
-            // }
+            //foreach (var location in Game1.locations)
+            //{
+            //    ConvertCustomWorkbenchesToStandard(location);
+            //}
         }
 
         private void OnSaved(object? sender, SavedEventArgs e)
         {
             /* Unused now. */
-            // foreach (var location in Game1.locations)
-            // {
-            //     CheckForFarmLinkTerminal(location);
-            // }
+            //foreach (var location in Game1.locations)
+            //{
+            //    CheckForFarmLinkTerminal(location);
+            //}
         }
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
@@ -218,39 +309,44 @@ namespace UltimateStorageSystem
             if (Context.IsPlayerFree && e.Button.IsActionButton())
             {
                 Vector2 tile = e.Cursor.Tile;
-                if (IsFarmLinkTerminalOnTile(tile, out StardewValley.Object terminalObject))
+                if (IsFarmLinkTerminalOnTile(tile, out Object? terminalObject) && FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
                 {
-                    if (FarmLinkTerminal.IsPlayerBelowTileAndFacingUp(Game1.player, terminalObject.TileLocation))
-                    {
-                        IgnoreNextRightClick = true;
-                        OpenFarmLinkTerminalMenu();
-                    }
+                    IgnoreNextRightClick = true;
+                    OpenFarmLinkTerminalMenu();
                 }
             }
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         private void OnLocationChanged(object? sender, WarpedEventArgs e)
         {
             /* Unused now. */
             // CheckForFarmLinkTerminal(e.NewLocation);
         }
 
-        private void OnObjectListChanged(object? sender, ObjectListChangedEventArgs e)
+        private static void OnObjectListChanged(object? sender, ObjectListChangedEventArgs e)
         {
-            if (e.Removed.Any(obj => obj.Value.Name == farmLinkTerminalName))
+            if (e.Removed.Any(obj => obj.Value.Name == ModEntry.FarmLinkTerminalName))
             {
-                RevertCustomWorkbenches(e.Location);
+                ModEntry.RevertCustomWorkbenches(e.Location);
             }
 
             /* Unused now. */
-            // CheckForFarmLinkTerminal(e.Location);
+            //CheckForFarmLinkTerminal(e.Location);
         }
 
         internal static bool IsFarmLinkTerminalPlaced()
+        {
             // Prüfe im FarmHouse
-         => Game1.locations.OfType<FarmHouse>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName)) ||
+            if (Game1.locations.OfType<FarmHouse>().Any(location => location.objects.Values.Any(obj => obj.Name == ModEntry.FarmLinkTerminalName)))
+                return true;
+
             // Prüfe auf der Farm
-            Game1.locations.OfType<Farm>().Any(location => location.objects.Values.Any(obj => obj.Name == farmLinkTerminalName));
+            if (Game1.locations.OfType<Farm>().Any(location => location.objects.Values.Any(obj => obj.Name == ModEntry.FarmLinkTerminalName)))
+                return true;
+
+            return false;
+        }
 
         /* Unused now. */
         //private void CheckForFarmLinkTerminal(GameLocation location)
@@ -259,12 +355,9 @@ namespace UltimateStorageSystem
 
         //    foreach (var pair in location.objects.Pairs)
         //    {
-        //        if (pair.Value is Workbench workbench && pair.Value is not CustomWorkbench)
+        //        if (pair.Value is Workbench workbench && pair.Value is not CustomWorkbench && IsTerminalAdjacent(pair.Key, location))
         //        {
-        //            if (IsTerminalAdjacent(pair.Key, location))
-        //            {
-        //                workbenchesToReplace.Add(new KeyValuePair<Vector2, Workbench>(pair.Key, workbench));
-        //            }
+        //            workbenchesToReplace.Add(new KeyValuePair<Vector2, Workbench>(pair.Key, workbench));
         //        }
         //    }
 
@@ -279,8 +372,7 @@ namespace UltimateStorageSystem
         {
             foreach (var offset in AdjacentTilesOffsets)
             {
-                Vector2 adjacentTile = tileLocation + offset;
-                if (location.objects.TryGetValue(adjacentTile, out StardewValley.Object adjacentObject) && adjacentObject.Name == farmLinkTerminalName)
+                if (location.objects.TryGetValue(tileLocation + offset, out Object? adjacentObject) && adjacentObject.Name == ModEntry.FarmLinkTerminalName)
                 {
                     return true;
                 }
@@ -289,7 +381,7 @@ namespace UltimateStorageSystem
         }
 
         // Still use this to unpatch ny CustomWorkbenches if required.
-        private void RevertCustomWorkbenches(GameLocation location)
+        private static void RevertCustomWorkbenches(GameLocation location)
         {
             List<Vector2> customWorkbenchesToRevert = [];
 
@@ -328,12 +420,23 @@ namespace UltimateStorageSystem
         //    }
         //}
 
-        private bool IsFarmLinkTerminalOnTile(Vector2 tile, out StardewValley.Object terminalObject)
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        /// <summary>
+        /// Chests if the <see cref="FarmLinkTerminal"/> in on a tile.
+        /// </summary>
+        /// <param name="tile">The tile to check against.</param>
+        /// <param name="terminalObject">The returned <see cref="FarmLinkTerminal"/> as an <inheritdoc cref="StardewValley.Object"/>.</param>
+        /// <returns>Returns true if the tile contains a <see cref="FarmLinkTerminal"/> otherwise false.</returns>
+        private bool IsFarmLinkTerminalOnTile(Vector2 tile, [NotNullWhen(true)] out Object? terminalObject)
         {
-            return (Game1.currentLocation.objects.TryGetValue(tile, out terminalObject) && terminalObject.Name == farmLinkTerminalName) ||
-                   (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(0, 1), out terminalObject) && terminalObject.Name == farmLinkTerminalName);
+            return (Game1.currentLocation.objects.TryGetValue(tile,                     out terminalObject) && terminalObject.Name == ModEntry.FarmLinkTerminalName) ||
+                   (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(0, 1), out terminalObject) && terminalObject.Name == ModEntry.FarmLinkTerminalName);
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        /// <summary>
+        /// A method to open the <see cref="FarmLinkTerminalMenu"/>.
+        /// </summary>
         private void OpenFarmLinkTerminalMenu()
         {
             var itemTransferManager = new ItemTransferManager(GetAllChests(), new ItemTable(0, 0));
@@ -341,15 +444,19 @@ namespace UltimateStorageSystem
             Game1.activeClickableMenu = new FarmLinkTerminalMenu(GetAllChests());
         }
 
-        internal static void AddChestsFromLocation(GameLocation location, ref List<Chest> chestList)
+        /// <summary>
+        /// Adds chests to a list from a specified <see cref="GameLocation"/>.
+        /// </summary>
+        /// <param name="location">The <see cref="GameLocation"/> to check for player chests at.</param>
+        private static IEnumerable<Chest> AddChestsFromLocation(GameLocation location)
         {
             // Alle Objekte in der Location durchsuchen
-            chestList.AddRange(location.objects.Values.OfType<Chest>().Where(chest => chest.SpecialChestType is Chest.SpecialChestTypes.None or Chest.SpecialChestTypes.BigChest));
+            List<Chest> output = [..location.objects.Values.OfType<Chest>().Where(chest => chest.SpecialChestType is Chest.SpecialChestTypes.None or Chest.SpecialChestTypes.BigChest)];
 
             // Kühlschrank im Farmhaus prüfen
-            if (location is FarmHouse farmHouse && farmHouse.fridge.Value is Chest fridge)
+            if (location is FarmHouse farmHouse && farmHouse.fridge.Value is Chest fridge && farmHouse.upgradeLevel > 0)
             {
-                chestList.Add(fridge);
+                output.Add(fridge);
             }
 
             // Gebäude in spezifischen Locations durchsuchen
@@ -358,33 +465,70 @@ namespace UltimateStorageSystem
 
                 if (location is Farm farm)
                 {
-                    ModEntry.Instance.Monitor.Log($"location is typeof of farm and the name of the location is \"{location.Name}\".");
+                    Instance.Monitor.Log($"location is typeof of farm and the name of the location is \"{location.Name}\".");
                     foreach (var building in farm.buildings)
                     {
-                        if (building.indoors.Value != null)
+                        if (building.indoors.Value is not null)
                         {
-                            ModEntry.AddChestsFromLocation(building.indoors.Value, ref chestList);
+                            output.AddRange(AddChestsFromLocation(building.indoors.Value));
                         }
                     }
                 }
                 else
                 {
-                    ModEntry.Instance.Monitor.Log($"location is not typeof of farm and the name of the location is \"{location.Name}\".");
+                    Instance.Monitor.Log($"location is not typeof of farm and the name of the location is \"{location.Name}\".");
                 }
             }
+
+            return output;
         }
 
-        private List<Chest> GetAllChests()
+        /// <summary>
+        /// Get all chests and filter every single chest based on their filter stats and if the host's config is using whitelist or not.
+        /// </summary>
+        /// <returns>List of chests in the various <see cref="GameLocation"/>s.</returns>
+        internal static List<Chest> GetAllChests()
         {
-            List<Chest> chests = [];
-
             // Durchlaufe alle Locations im Spiel
-            foreach (var location in Game1.locations)
+            return [..Game1.locations.SelectMany(AddChestsFromLocation).Where(chest => chest.IsFiltered() ^ IsNotUsingWhitelist)];
+        }
+
+        /// <inheritdoc cref="Game1.playSound(string, int?)"/>
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
+        internal static bool TryPlaySound(string cueName, int? pitch = null)
+        {
+            try
             {
-                AddChestsFromLocation(location, ref chests);
+                Game1.playSound(cueName, pitch);
+                return true;
+            }
+            catch { /* Do nothing... */ }
+            return false;
+        }
+
+        internal static bool IsMainFarmer(Farmer? farmer)
+        {
+            return farmer is not null && IsMainFarmer(farmer.UniqueMultiplayerID);
+        }
+
+        internal static bool IsMainFarmer(long farmerID)
+        {
+            return GetMainFarmer() is Farmer farmer && farmer.UniqueMultiplayerID == farmerID;
+        }
+
+        internal static Farmer? GetMainFarmer()
+        {
+            if (!Context.HasRemotePlayers || Context.IsMainPlayer)
+            {
+                return Game1.player;
             }
 
-            return chests;
+            return Game1.getAllFarmers().FirstOrDefault(x => x.IsMainPlayer);
+        }
+
+        internal static Farmer? GetFarmer(long farmerID)
+        {
+            return Game1.getAllFarmers().FirstOrDefault(x => x.UniqueMultiplayerID == farmerID);
         }
     }
 }

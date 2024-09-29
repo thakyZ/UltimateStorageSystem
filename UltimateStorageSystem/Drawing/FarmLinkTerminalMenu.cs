@@ -9,23 +9,40 @@ namespace UltimateStorageSystem.Drawing
     public class FarmLinkTerminalMenu : IClickableMenu
     {
         // Definition of GUI components and parameters
-        private InventoryMenu playerInventoryMenu; // Player inventory menu
-        private int containerWidth = 830; // Width of the main container
-        private int containerHeight = 900; // Height of the main container
-        private int computerMenuHeight; // Height of the computer menu
-        private int inventoryMenuWidth; // Width of the inventory menu
-        private int inventoryMenuHeight = 280; // Fixed height for the bottom frame (inventory area)
+        /// <summary>Player inventory menu</summary>
+        private readonly InventoryMenu playerInventoryMenu;
+        // ReSharper disable ConvertToConstant.Local
+        /// <summary>Width of the main container</summary>
+        private readonly int           containerWidth  = 830;
+        /// <summary>Height of the main container</summary>
+        private readonly int           containerHeight = 900;
+        /// <summary>Height of the computer menu</summary>
+        private readonly int           computerMenuHeight;
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        /// <summary>Width of the inventory menu</summary>
+        private readonly int           inventoryMenuWidth;
+        /// <summary>Fixed height for the bottom frame (inventory area)</summary>
+        private readonly int           inventoryMenuHeight = 280;
+        // ReSharper restore ConvertToConstant.Local
 
-        private ItemTable itemTable; // Table for displaying items
-        private Scrollbar scrollbar; // Scrollbar for the table
-        private SearchBox searchBox; // Search box for filtering items
-        private InputHandler inputHandler; // Handles input within the menu
-        private ItemTransferManager itemTransferManager; // Manager for transferring items
+        /// <summary>Table for displaying items</summary>
+        private readonly ItemTable           itemTable;
+        /// <summary>Scrollbar for the table</summary>
+        private readonly Scrollbar           scrollbar;
+        /// <summary>Search box for filtering items</summary>
+        private readonly SearchBox           searchBox;
+        /// <summary>Handles input within the menu</summary>
+        private readonly InputHandler        inputHandler;
+        /// <summary>Manager for transferring items</summary>
+        private readonly ItemTransferManager itemTransferManager;
 
-        private List<ClickableTextureComponent> tabs; // Liste der Reiter
-        private int selectedTab; // Der aktuell ausgewählte Reiter
+        /// <summary>Liste der Reiter</summary>
+        private readonly List<ClickableTextureComponent> tabs;
+        /// <summary>Der aktuell ausgewählte Reiter</summary>
+        private          int                             selectedTab;
 
-        // Constructor for the menu, initializes the GUI components.
+        /// <summary>Constructor for the menu, initializes the GUI components.</summary>
+        /// <param name="chests">The list of chests in the network.</param>
         public FarmLinkTerminalMenu(List<Chest> chests) : base((Game1.viewport.Width / 2) - 400, (Game1.viewport.Height / 2) - 500, 800, 1000)
         {
             // Calculate the position of the container relative to the screen.
@@ -36,8 +53,10 @@ namespace UltimateStorageSystem.Drawing
             computerMenuHeight = containerHeight - inventoryMenuHeight;
 
             // Calculate the width of the inventory menu based on the number of slots per row.
+            // ReSharper disable ConvertToConstant.Local
             int slotsPerRow = 12; // Assumption: 12 slots per row
             int slotSize = 64; // Size of an inventory slot
+            // ReSharper restore ConvertToConstant.Local
             inventoryMenuWidth = slotsPerRow * slotSize;
 
             // Position of the inventory menu.
@@ -75,7 +94,8 @@ namespace UltimateStorageSystem.Drawing
             selectedTab = 0; // Standardmäßig den ersten Reiter auswählen
         }
 
-        // Draws the menu and all components.
+        /// <summary>Draws the menu and all components.</summary>
+        /// <param name="b">The sprite back in which to draw the menu with.</param>
         public override void draw(SpriteBatch b)
         {
             base.draw(b);
@@ -88,18 +108,19 @@ namespace UltimateStorageSystem.Drawing
                 b.Draw(Game1.staminaRect, new Rectangle(this.xPositionOnScreen + 12, this.yPositionOnScreen + 12, containerWidth - 24, computerMenuHeight - 24), Color.Black);
 
                 // Zeichnet den Titel des Terminal-Menüs fett.
-                string title = "ULTIMATE STORAGE SYSTEM";
+                const string title = "ULTIMATE STORAGE SYSTEM";
 
                 // Setze die maximale Breite und den Abstand von rechts
-                float maxTitleWidth = 400f;
-                float rightPadding = 30f;
+                const float  maxTitleWidth = 400f;
+                const float rightPadding  = 30f;
 
                 // Berechnet die Skalierung basierend auf der Breite des Textes
                 float scale = Math.Min(1f, maxTitleWidth / Game1.dialogueFont.MeasureString(title).X);
 
                 // Berechnet die Position des Titels, rechtsbündig mit 20px Abstand
-                Vector2 titlePosition = new Vector2(
-                    this.xPositionOnScreen + this.containerWidth - rightPadding - maxTitleWidth,
+                // ReSharper disable once BadIndent
+                var titlePosition = new Vector2(
+                this.xPositionOnScreen + this.containerWidth - rightPadding - maxTitleWidth,
                     this.yPositionOnScreen + 40
                 );
 
@@ -111,6 +132,7 @@ namespace UltimateStorageSystem.Drawing
                 {
                     for (int dy = -1; dy <= 1; dy++)
                     {
+                        // ReSharper disable BadIndent, BadParensLineBreaks
                         Game1.spriteBatch.DrawString(
                             Game1.dialogueFont,
                             title,
@@ -122,6 +144,7 @@ namespace UltimateStorageSystem.Drawing
                             SpriteEffects.None,
                             0.86f
                         );
+                        // ReSharper restore BadIndent, BadParensLineBreaks
                     }
                 }
 
@@ -130,6 +153,7 @@ namespace UltimateStorageSystem.Drawing
                 {
                     for (int dy = -1; dy <= 1; dy++)
                     {
+                        // ReSharper disable BadIndent, BadParensLineBreaks
                         Game1.spriteBatch.DrawString(
                             Game1.dialogueFont,
                             title,
@@ -141,6 +165,7 @@ namespace UltimateStorageSystem.Drawing
                             SpriteEffects.None,
                             0.86f
                         );
+                        // ReSharper restore BadIndent, BadParensLineBreaks
                     }
                 }
 
@@ -193,7 +218,7 @@ namespace UltimateStorageSystem.Drawing
                 if (tabs.IndexOf(tab) == 0)
                 {
                     sourceRect = Game1.getSourceRectForStandardTileSheet(chestIcon, 166, 16, 16); // Icon Schatzkiste
-                    tabIconPosition = new Vector2(xPositionOnScreen + 36, yPositionOnScreen - 40 + yOffset);
+                    tabIconPosition = new(xPositionOnScreen + 36, yPositionOnScreen - 40 + yOffset);
                 }
                 else if (tabs.IndexOf(tab) == 1)
                 {
@@ -213,7 +238,7 @@ namespace UltimateStorageSystem.Drawing
                 else if (tabs.IndexOf(tab) == 2)
                 {
                     sourceRect = Game1.getSourceRectForStandardTileSheet(chestIcon, 241, 16, 16); // Icon Hamburger
-                    tabIconPosition = new Vector2(xPositionOnScreen + 172, yPositionOnScreen - 40 + yOffset);
+                    tabIconPosition = new(xPositionOnScreen + 172, yPositionOnScreen - 40 + yOffset);
                 }
                 else // Index == 3
                 {
@@ -221,10 +246,10 @@ namespace UltimateStorageSystem.Drawing
                     Texture2D? basketTexture = ModEntry.BasketTexture;
 
                     if (basketTexture is null) continue;
-                    sourceRect = new Rectangle(0, 0, basketTexture.Width, basketTexture.Height);
+                    sourceRect = new(0, 0, basketTexture.Width, basketTexture.Height);
 
                     // Position des Basket-Icons anpassen
-                    Vector2 basketIconPosition = new Vector2(tab.bounds.X + 16, tab.bounds.Y + 22 + yOffset);
+                    Vector2 basketIconPosition = new(tab.bounds.X + 16, tab.bounds.Y + 22 + yOffset);
                     b.Draw(basketTexture, basketIconPosition, sourceRect, Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 1f);
 
                     // Überspringe das Zeichnen des Standard-Icons
@@ -238,47 +263,51 @@ namespace UltimateStorageSystem.Drawing
             this.drawMouse(b);
         }
 
-        // Processes left-clicks on the menu.
+        /// <summary>Processes left-clicks on the menu.</summary>
+        /// <param name="x">X-coordinate of mouse click.</param>
+        /// <param name="y">Y-coordinate of mouse click.</param>
+        /// <param name="playSound">Determines if we should play sound.</param>
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
-            foreach (var tab in tabs)
+            foreach (ClickableTextureComponent tab in tabs.Where(tab => tab.containsPoint(x, y)))
             {
-                if (tab.containsPoint(x, y))
-                {
-                    selectedTab = tabs.IndexOf(tab); // Setze den ausgewählten Reiter
+                selectedTab = tabs.IndexOf(tab); // Setze den ausgewählten Reiter
+                if (playSound)
                     Game1.playSound("smallSelect"); // Spiele einen Soundeffekt ab
-                    return; // Beende die Methode, damit nicht versehentlich das Menü interagiert
-                }
+                return; // Beende die Methode, damit nicht versehentlich das Menü interagiert
             }
 
             // Nur Aktionen verarbeiten, wenn der erste Tab ausgewählt ist
-            if (selectedTab == 0)
+            if (selectedTab != 0)
+                return;
+
+            if (new Rectangle(searchBox.TextBox.X, searchBox.TextBox.Y, searchBox.TextBox.Width, searchBox.TextBox.Height).Contains(x, y))
             {
-                if (new Rectangle(searchBox.textBox.X, searchBox.textBox.Y, searchBox.textBox.Width, searchBox.textBox.Height).Contains(x, y))
-                {
-                    searchBox.Click();
-                }
-                else
-                {
-                    inputHandler.ReceiveLeftClick(x, y, playSound);
-                    itemTable.ReceiveLeftClick(x, y);
-
-                    Item? clickedItem = GetItemAt(x, y, out bool isInInventory);
-                    if (clickedItem is not null)
-                    {
-                        bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-                        itemTransferManager.HandleLeftClick(clickedItem, isInInventory, shiftPressed);
-
-                        string searchText = searchBox.textBox.Text.TrimStart(searchBox.nonBreakingSpace);
-                        itemTable.FilterItems(searchText);
-                    }
-                }
-
-                ItemTableRenderer.HandleHeaderClick(x, y, itemTable);
+                searchBox.Click();
             }
+            else
+            {
+                inputHandler.ReceiveLeftClick(x, y, playSound);
+                itemTable.ReceiveLeftClick(x, y);
+
+                Item? clickedItem = GetItemAt(x, y, out bool isInInventory);
+                if (clickedItem is not null)
+                {
+                    bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
+                    itemTransferManager.HandleLeftClick(clickedItem, isInInventory, shiftPressed);
+
+                    string searchText = searchBox.TextBox.Text.TrimStart(SearchBox.NonBreakingSpace);
+                    itemTable.FilterItems(searchText);
+                }
+            }
+
+            ItemTableRenderer.HandleHeaderClick(x, y, itemTable);
         }
 
-        // Processes right-clicks on the menu.
+        /// <summary>Processes right-clicks on the menu.</summary>
+        /// <param name="x">X-coordinate of mouse click.</param>
+        /// <param name="y">Y-coordinate of mouse click.</param>
+        /// <param name="playSound">Determines if we should play sound.</param>
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
             if (ModEntry.Instance.IgnoreNextRightClick)
@@ -287,32 +316,36 @@ namespace UltimateStorageSystem.Drawing
                 return;
             }
 
-            if (selectedTab == 0)
+            if (selectedTab != 0)
             {
-                Item? clickedItem = GetItemAt(x, y, out bool isInInventory);
-                if (clickedItem is not null)
-                {
-                    bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
-                    itemTransferManager.HandleRightClick(clickedItem, isInInventory, shiftPressed);
-
-                    string searchText = searchBox.textBox.Text.TrimStart(searchBox.nonBreakingSpace);
-                    itemTable.FilterItems(searchText);
-                }
+                return;
             }
+
+            Item? clickedItem = GetItemAt(x, y, out bool isInInventory);
+
+            if (clickedItem is null)
+                return;
+
+            bool shiftPressed = Game1.oldKBState.IsKeyDown(Keys.LeftShift) || Game1.oldKBState.IsKeyDown(Keys.RightShift);
+            itemTransferManager.HandleRightClick(clickedItem, isInInventory, shiftPressed);
+
+            string searchText = searchBox.TextBox.Text.TrimStart(SearchBox.NonBreakingSpace);
+            itemTable.FilterItems(searchText);
         }
 
-        // Retrieves the clicked item from the inventory or table.
+        /// <summary>Retrieves the clicked item from the inventory or table.</summary>
+        /// <param name="x">X-coordinate of the mouse.</param>
+        /// <param name="y">X-coordinate of the mouse.</param>
+        /// <param name="isInInventory">Returns a variable determining if the item is already in the player's inventory.</param>
+        /// <returns>The fetched item or null if no item is found.</returns>
         private Item? GetItemAt(int x, int y, out bool isInInventory)
         {
             isInInventory = false;
 
-            foreach (ClickableComponent slot in playerInventoryMenu.inventory)
+            foreach (ClickableComponent slot in playerInventoryMenu.inventory.Where(slot => slot.containsPoint(x, y) && playerInventoryMenu.actualInventory.Count > slot.myID))
             {
-                if (slot.containsPoint(x, y) && playerInventoryMenu.actualInventory.Count > slot.myID)
-                {
-                    isInInventory = true;
-                    return playerInventoryMenu.actualInventory[slot.myID];
-                }
+                isInInventory = true;
+                return playerInventoryMenu.actualInventory[slot.myID];
             }
 
             for (int i = 0; i < itemTable.GetVisibleRows(); i++)
@@ -333,19 +366,25 @@ namespace UltimateStorageSystem.Drawing
             return null;
         }
 
-        // Processes holding the left mouse button.
+        /// <summary>Processes holding the left mouse button.</summary>
+        /// <param name="x">X-coordinate of the mouse.</param>
+        /// <param name="y">Y-coordinate of the mouse.</param>
         public override void leftClickHeld(int x, int y)
         {
             inputHandler.LeftClickHeld(x, y);
         }
 
-        // Processes releasing the left mouse button.
+        /// <summary>Processes releasing the left mouse button.</summary>
+        /// <param name="x">X-coordinate of the mouse.</param>
+        /// <param name="y">Y-coordinate of the mouse.</param>
         public override void releaseLeftClick(int x, int y)
         {
             inputHandler.ReleaseLeftClick(x, y);
         }
 
-        // Processes hover actions.
+        /// <summary>Processes hover actions.</summary>
+        /// <param name="x">X-coordinate of the mouse.</param>
+        /// <param name="y">Y-coordinate of the mouse.</param>
         public override void performHoverAction(int x, int y)
         {
             inputHandler.PerformHoverAction(x, y);
@@ -355,13 +394,16 @@ namespace UltimateStorageSystem.Drawing
             }
         }
 
-        // Processes keyboard inputs.
+        /// <summary>Processes keyboard inputs.</summary>
+        /// <param name="key">An enum representing the key on a keyboard.</param>
         public override void receiveKeyPress(Keys key)
         {
             inputHandler.ReceiveKeyPress(key);
         }
 
-        // Processes scroll wheel actions.
+        /// <summary>Processes scroll wheel actions.</summary>
+        /// <param name="direction">Scrolling up is +1 while down is -1</param>
+        /// <remark>The sign of the integer for directions may be backwards.</remark>
         public override void receiveScrollWheelAction(int direction)
         {
             if (selectedTab == 0)

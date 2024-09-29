@@ -6,8 +6,8 @@ namespace UltimateStorageSystem.Utilities
 {
     internal sealed class Logger : IMonitor
     {
-        private static Logger   _instance = null!;
-        private        IMonitor _monitor;
+        private static   Logger   _instance = null!;
+        private readonly IMonitor _monitor;
 
         /// <inheritdoc cref="IMonitor.IsVerbose"/>
         bool     IMonitor.IsVerbose => _instance._monitor.IsVerbose;
@@ -27,6 +27,12 @@ namespace UltimateStorageSystem.Utilities
         {
             _instance     = this;
             this._monitor = monitor;
+        }
+
+        public static void CustomTrace(string message)
+        {
+            if (ModEntry.TraceLogging)
+                _instance._monitor.Log(message, LogLevel.Info);
         }
 
         /// <inheritdoc cref="IMonitor.Log"/>
@@ -92,13 +98,13 @@ namespace UltimateStorageSystem.Utilities
         /// <inheritdoc cref="IMonitor.Log"/>
         public static void Trace(string message)
         {
-            _instance._monitor.Log(message, LogLevel.Trace);
+            _instance._monitor.Log(message);
         }
 
         /// <inheritdoc cref="IMonitor.LogOnce"/>
         public static void TraceOnce(string message)
         {
-            _instance._monitor.LogOnce(message, LogLevel.Trace);
+            _instance._monitor.LogOnce(message);
         }
 
         /// <inheritdoc cref="IMonitor.Log"/>

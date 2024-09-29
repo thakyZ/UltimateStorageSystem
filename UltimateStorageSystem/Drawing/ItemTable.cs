@@ -4,26 +4,31 @@
 // item list.
 
 using Microsoft.Xna.Framework.Graphics;
-using UltimateStorageSystem.Interfaces; // Import the interface
+using UltimateStorageSystem.Interfaces;
+
+using static System.String; // Import the interface
 
 namespace UltimateStorageSystem.Drawing
 {
     public class ItemTable : IFilterableTable, IScrollableTable // Implementing both interfaces
     {
-        // Starting position of the table
+        /// <summary>X-coordinate of the starting position of the table</summary>
         public int StartX { get; }
+        /// <summary>Y-coordinate of the starting position of the table</summary>
         public int StartY { get; }
 
-        // List of all items displayed in the table
-        private List<ItemEntry> allItems;
+        /// <summary>List of all items displayed in the table</summary>
+        private readonly List<ItemEntry> allItems;
 
-        // List of filtered items currently displayed in the table
+        /// <summary>List of filtered items currently displayed in the table</summary>
         private List<ItemEntry> filteredItems;
 
-        // The current scroll index indicating the starting position of the displayed items
+        /// <summary>The current scroll index indicating the starting position of the displayed items</summary>
         public int ScrollIndex { get; set; }
 
-        // Constructor, initializes the table with a starting position
+        /// <summary>Constructor, initializes the table with a starting position</summary>
+        /// <param name="startX">X-coordinate for the item table to draw.</param>
+        /// <param name="startY">Y-coordinate for the item table to draw.</param>
         public ItemTable(int startX, int startY)
         {
             this.StartX = startX;
@@ -33,32 +38,35 @@ namespace UltimateStorageSystem.Drawing
             this.ScrollIndex = 0;
         }
 
-        // Adds an item to the table
+        /// <summary>Adds an item to the table</summary>
+        /// <param name="item">Entry for the item to display.</param>
         public void AddItem(ItemEntry item)
         {
             allItems.Add(item);
             filteredItems.Add(item);
         }
 
-        // Returns the currently filtered item entries
+        /// <summary>Returns the currently filtered item entries</summary>
+        /// <returns>List of all item entries.</returns>
         public List<ItemEntry> GetItemEntries()
         {
             return filteredItems;
         }
 
-        // Returns the number of visible rows in the table
+        /// <summary>Returns the number of visible rows in the table</summary>
         public int GetVisibleRows()
         {
             return 13; // Example: 13 visible rows
         }
 
-        // Returns the number of item entries in the table
+        /// <summary>Returns the number of item entries in the table</summary>
         public int GetItemEntriesCount()
         {
             return filteredItems.Count;
         }
 
-        // Draws the table and its contents
+        /// <summary>Draws the table and its contents</summary>
+        /// <param name="b">The spritebatch of which to draw the contents of.</param>
         public void Draw(SpriteBatch b)
         {
             // Draws the headers of the table
@@ -83,28 +91,31 @@ namespace UltimateStorageSystem.Drawing
             }
         }
 
-        // Filters the items in the table based on the search text
+        /// <summary>Filters the items in the table based on the search text</summary>
+        /// <param name="searchText">The text to search via</param>
         public void FilterItems(string searchText)
         {
-            filteredItems = new List<ItemEntry>(allItems);
+            filteredItems = [..allItems];
 
-            if (string.IsNullOrWhiteSpace(searchText))
+            if (IsNullOrWhiteSpace(searchText))
                 return;
 
             // Filters the items whose names contain the search text
             filteredItems = filteredItems.FindAll(item => item.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
         }
 
-        // Sorts the items in the table based on the specified column and sort direction
+        /// <summary>Sorts the items in the table based on the specified column and sort direction</summary>
+        /// <param name="sortBy">Sort by row title.</param>
+        /// <param name="ascending">Determines if we should sort ascending or descending.</param>
         public void SortItemsBy(string sortBy, bool ascending)
         {
             switch (sortBy)
             {
                 case "Name":
                     if (ascending)
-                        filteredItems.Sort((a, b) => a.Name.CompareTo(b.Name));
+                        filteredItems.Sort((a, b) => CompareOrdinal(a.Name, b.Name));
                     else
-                        filteredItems.Sort((a, b) => b.Name.CompareTo(a.Name));
+                        filteredItems.Sort((a, b) => CompareOrdinal(b.Name, a.Name));
                     break;
                 case "Quantity":
                     if (ascending)
@@ -127,13 +138,15 @@ namespace UltimateStorageSystem.Drawing
             }
         }
 
-        // Refreshes the filtered list of items
+        /// <summary>Refreshes the filtered list of items</summary>
         public void Refresh()
         {
-            filteredItems = new List<ItemEntry>(allItems);
+            filteredItems = [..allItems];
         }
 
-        // Updates the quantity and value of an item in the table or adds it if it does not exist
+        /// <summary>Updates the quantity and value of an item in the table or adds it if it does not exist</summary>
+        /// <param name="item">An item yo update to the item list.</param>
+        /// <param name="remainingAmount">The remaining items to update on the system.</param>
         public void UpdateItemList(Item item, int remainingAmount)
         {
             // Searches for the entry corresponding to the specified item
@@ -160,21 +173,25 @@ namespace UltimateStorageSystem.Drawing
             Refresh();
         }
 
-        // Processes left-clicks on the table
-        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163")]
+        /// <summary>Processes left-clicks on the table</summary>
+        /// <param name="x">X-coordinate of the left click on the menu.</param>
+        /// <param name="y">Y-coordinate of the left click on the menu.</param>
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163"), SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
         public void ReceiveLeftClick(int x, int y)
         {
             // Logic for left-clicks on the table
         }
 
-        // Processes hover actions on the table
+        /// <summary>Processes hover actions on the table</summary>
+        /// <param name="x">X-coordinate of the mouse over the menu.</param>
+        /// <param name="y">Y-coordinate of the mouse over the menu.</param>
         [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1163")]
         public void PerformHoverAction(int x, int y)
         {
             ItemTableRenderer.PerformHoverAction(x, y, this);
         }
 
-        // Clears all items in the table
+        /// <summary>Clears all items in the table</summary>
         public void ClearItems()
         {
             allItems.Clear();

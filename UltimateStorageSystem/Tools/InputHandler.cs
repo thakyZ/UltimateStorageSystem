@@ -64,7 +64,6 @@ namespace UltimateStorageSystem.Tools
             {
                 // Close the menu when the Escape key is pressed
                 terminalMenu.exitThisMenu();
-                return;
             }
         }
 

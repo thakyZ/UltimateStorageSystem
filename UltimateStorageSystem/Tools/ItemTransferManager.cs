@@ -36,7 +36,7 @@ namespace UltimateStorageSystem.Tools
                     {
                         string key = $"{item.DisplayName}_{item.Category}_{item.Quality}_{item.ParentSheetIndex}";
 
-                        int itemPrice = item.sellToStorePrice(-1L); // Verkaufspreis entsprechend dem Vanilla-Inventar
+                        int itemPrice = item.sellToStorePrice(/* -1L */); // Verkaufspreis entsprechend dem Vanilla-Inventar
 
                         if (groupedItems.ContainsKey(key))
                         {
@@ -50,8 +50,7 @@ namespace UltimateStorageSystem.Tools
                                 item.Stack,
                                 Math.Max(0, itemPrice),
                                 Math.Max(0, itemPrice) * item.Stack,
-                                item
-                            );
+                                item);
                         }
                     }
                 }
@@ -76,31 +75,28 @@ namespace UltimateStorageSystem.Tools
             int remainingAmount = amount;
 
             // Sortiere die Truhen nach der Anzahl vorhandener Gegenstände in aufsteigender Reihenfolge
-            var sortedChests = chests
-                .Select(chest => new
-                {
+            List<Chest> sortedChests = [..chests
+                .Select(chest => new {
                     Chest = chest,
-                    ItemCount = chest.Items.Where(i => i?.canStackWith(item) == true).Sum(i => i.Stack)
+                    ItemCount = chest.Items.Where(i => i.Equals(other: item)).Sum(i => i.Stack)
                 })
                 .Where(chestInfo => chestInfo.ItemCount > 0) // Nur Truhen mit dem Gegenstandstyp
-                .OrderBy(chest => chest.ItemCount)
-                .ToList();
+                .OrderBy(chest => chest.ItemCount).Select(chestInfo => chestInfo.Chest)];
 
-            foreach (var chestInfo in sortedChests)
+            foreach (var chest in sortedChests)
             {
-                var chest = chestInfo.Chest;
-
                 for (int i = chest.Items.Count - 1; i >= 0; i--)
                 {
                     Item chestItem = chest.Items[i];
 
-                    if (chestItem?.canStackWith(item) == true)
+                    if (chestItem.Equals(other: item))
                     {
                         int transferAmount = Math.Min(chestItem.Stack, remainingAmount);
 
                         // Sicherstellen, dass mindestens ein Item verbleibt, wenn es die letzte Truhe ist
                         // chestItem.Stack - transferAmount <= 0
-                        if (chestItem.Stack <= transferAmount && chestItem.Stack > 1 && chest == sortedChests[^1].Chest)
+
+                        if (chestItem.Stack <= transferAmount && chestItem.Stack > 1 && chest.Equals(other: sortedChests[^1]))
                         {
                             transferAmount = chestItem.Stack - 1;
                         }
@@ -139,24 +135,25 @@ namespace UltimateStorageSystem.Tools
             int remainingAmount = amount;
 
             // Sortiere die Truhen nach der Anzahl vorhandener Gegenstände in absteigender Reihenfolge
-            var sortedChests = chests
-                .Select(chest => new
-                {
-                    Chest = chest,
-                    ItemCount = chest.Items.Where(i => i?.canStackWith(item) == true).Sum(i => i.Stack)
+            List<Chest> chestInfos = [..chests
+                .Select(chest => new {
+                    Chest              = chest,
+                    HasSpace           = chest.HasRoomForItem(item),
+                    ItemCount          = chest.Items.Where(i => i?.canStackWith(item) == true).Sum(i => i.Stack),
+                    ItemCountStackable = chest.Items.Where((Item? i) => i?.canStackWith(other: item) == true && i.Stack < i.maximumStackSize() && i.Stack + item.Stack <= i.maximumStackSize()).Sum((Item? i) => i?.Stack ?? 0),
                 })
-                .Where(chestInfo => chestInfo.ItemCount > 0) // Nur Truhen mit dem Item-Typ
-                .OrderByDescending(chestInfo => chestInfo.ItemCount)
-                .ToList();
+                .Where(chestInfo => chestInfo.HasSpace) // Nur Truhen mit dem Item-Typ
+                .OrderBy(chestInfo => chestInfo.HasSpace)
+                .ThenBy(chestInfo => chestInfo.ItemCountStackable)
+                .Select(chestInfo => chestInfo.Chest)
+                .Reverse()];
 
-            foreach (var chestInfo in sortedChests)
+            foreach (Chest? chest in chestInfos)
             {
-                Chest chest = chestInfo.Chest;
-
                 // Übertrage die Items in die Truhe, falls Platz vorhanden ist
                 Item remainingItem = item.getOne();
                 remainingItem.Stack = remainingAmount;
-                Item addedItem = chest.addItem(remainingItem);
+                Item? addedItem = chest.addItem(remainingItem);
 
                 // Bestimmen der tatsächlich übertragenen Menge
                 if (addedItem is null)
@@ -209,9 +206,7 @@ namespace UltimateStorageSystem.Tools
         // Methode zur Verarbeitung eines Links-Klicks
         public void HandleLeftClick(Item item, bool isInInventory, bool shiftPressed)
         {
-            int amountToTransfer;
-
-            if (item is Furniture || item is Ring || item is MeleeWeapon || item is Tool || item is Boots)
+            if (item.maximumStackSize() == 1)
             {
                 if (!isInInventory)
                 {
@@ -234,6 +229,8 @@ namespace UltimateStorageSystem.Tools
             }
             else
             {
+                int amountToTransfer;
+
                 if (isInInventory)
                 {
                     // Bei Shift-Klick: Übertrage die Hälfte des Stacks ins Terminal
@@ -243,11 +240,11 @@ namespace UltimateStorageSystem.Tools
                 else
                 {
                     // Hier ist der Code für den Linksklick mit Umschalttaste zu prüfen
-                    var entry = itemTable.GetItemEntries().Find(e => e.Item == item);
+                    var entry = itemTable.GetItemEntries().Find(e => e.Item.Equals(other: item));
                     if (entry is not null)
                     {
                         int maxStackSize = item.maximumStackSize();
-                        int stackSize = Math.Min(maxStackSize / 2, entry.Quantity / 2); // Maximale Größe ist ein halbes Stack oder die Hälfte der verfügbaren Menge
+                        int stackSize    = Math.Min(maxStackSize / 2, entry.Quantity / 2); // Maximale Größe ist ein halbes Stack oder die Hälfte der verfügbaren Menge
                         amountToTransfer = shiftPressed ? stackSize : Math.Min(entry.Quantity, maxStackSize - 1);
                     }
                     else

@@ -2,40 +2,25 @@
 // This file defines a custom workbench that overrides the default behavior,
 // allowing it to interact with all chests in the game while managing global access locks.
 
-using Microsoft.Xna.Framework;
-using StardewValley;
 using StardewValley.Objects;
 using StardewValley.Menus;
-using StardewValley.Network;
-using System;
-using System.Collections.Generic;
 using StardewValley.Inventories;
-using StardewValley.Locations;
-using HarmonyLib;
 
 namespace UltimateStorageSystem.Patches
 {
+    [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("ReSharper", "InconsistentNaming"), SuppressMessage("ReSharper", "UnusedType.Global"), SuppressMessage("ReSharper", "UnusedMember.Global"),]
     [HarmonyPatch(typeof(Workbench), nameof(Workbench.checkForAction))]
     public static class Workbench_checkForAction_Patch
     {
-        private static bool IsTerminalAdjacent(Vector2 tileLocation, GameLocation location)
-        {
-            foreach (var offset in ModEntry.AdjacentTilesOffsets)
-            {
-                Vector2 adjacentTile = tileLocation + offset;
-                if (location.objects.TryGetValue(adjacentTile, out StardewValley.Object adjacentObject) && adjacentObject.Name == ModEntry.FarmLinkTerminalName)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // Overrides the method called when the player interacts with the workbench
-        [SuppressMessage("Roslynator", "RCS1163")]
+        /// <summary>Overrides the method called when the player interacts with the workbench</summary>
+        /// <param name="__instance">The instance of the <see cref="Workbench"/> class.</param>
+        /// <param name="__result">The output result of the original method.</param>
+        /// <param name="who">(Unused) the <see cref="Farmer"/> currently interacting with the workbench.</param>
+        /// <param name="justCheckingForActivity">Determines if we are currently checking for player activity or more.</param>
+        /// <returns><see langword="true" /> if we should continue the original method otherwise only use this prefix.</returns>
         public static bool Prefix(Workbench __instance, ref bool __result, Farmer who, bool justCheckingForActivity /* = false */) {
             GameLocation location = __instance.Location;
-            if (location == null) {
+            if (location is null) {
                 __result = false; // Set the return value of the Workbench.checkForAction method to default. (Probably not needed)
                 return true;      // Then continue to the original method.
             }
@@ -43,21 +28,12 @@ namespace UltimateStorageSystem.Patches
                 __result = false; // Set the return value of the Workbench.checkForAction method to default. (Probably not needed)
                 return true;      // Then continue to the original method.
             }
-            if (IsTerminalAdjacent(__instance.TileLocation, location)) {
+            if (ModEntry.IsTerminalAdjacent(__instance.TileLocation, location)) {
                 // Creates a list of all chests found
-                List<Chest> chestList = [];
-
                 // Durchlaufe alle Locations im Spiel
-                foreach (var gameLocation in Game1.locations)
-                {
-                    ModEntry.AddChestsFromLocation(gameLocation, ref chestList);
-                }
-
                 // Creates a list for the inventories of the found chests
-                List<IInventory> inventories = [];
-
                 // Adds the chest's inventory to the inventory list
-                inventories.AddRange(chestList.Select(chest => (IInventory)chest.Items));
+                List<IInventory> inventories = [..ModEntry.GetAllChests().Select(chest => (IInventory)chest.Items)];
 
                 // If the global chest lock is not set, executes the following logic
                 if (!__instance.mutex.IsLocked())
@@ -75,8 +51,7 @@ namespace UltimateStorageSystem.Patches
                             // Releases the global chest lock
                             __instance.mutex.ReleaseLock();
                         };
-                    },
-                    () =>
+                    }, () =>
                     {
                         // If locking the chests fails, displays an error message
                         Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Workbench_Chest_Warning"));
@@ -92,16 +67,19 @@ namespace UltimateStorageSystem.Patches
         }
     }
 
+    [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("ReSharper", "InconsistentNaming"), SuppressMessage("ReSharper", "UnusedType.Global"), SuppressMessage("ReSharper", "UnusedMember.Global"),]
     [HarmonyPatch(typeof(Workbench), nameof(Workbench.updateWhenCurrentLocation))]
     public static class Workbench_updateWhenCurrentLocation_Patch
     {
-        // Overrides the method that updates the workbench in the current location
+        /// <summary>Overrides the method that updates the workbench in the current location</summary>
+        /// <param name="__instance">The instance of the <see cref="Workbench"/> class.</param>
+        /// <returns><see langword="true" /> if we should continue the original method otherwise only use this prefix.</returns>
         public static bool Prefix(Workbench __instance)
         {
             GameLocation location = __instance.Location;
-            if (location != null)
+            if (location is not null)
                 __instance.mutex.Update(location);
-            return true; // continue to the original method.
+            return true; // Continue to the original method.
         }
     }
 }

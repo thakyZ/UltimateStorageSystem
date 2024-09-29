@@ -15,13 +15,13 @@ namespace UltimateStorageSystem.Drawing
     public class SearchBox
     {
         // Properties of the search box
-        [SuppressMessage("Roslynator", "RCS1170")]
-        public TextBox textBox { get; private set; } // The actual textbox for input
-        private readonly IFilterableTable table; // Reference to the table being filtered
-        private readonly Scrollbar scrollbar; // Reference to the scrollbar
-        private readonly Texture2D whiteTexture; // Simple white texture for drawing the background
-        public readonly char nonBreakingSpace = '\u00A0'; // Non-breaking space to prevent empty search queries
-        private string previousText; // Variable to store the previous text
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("Roslynator", "RCS1170")]
+        public TextBox TextBox { get; }                                // The actual textbox for input
+        private readonly IFilterableTable table;                       // Reference to the table being filtered
+        private readonly Scrollbar        scrollbar;                   // Reference to the scrollbar
+        private readonly Texture2D        whiteTexture;                // Simple white texture for drawing the background
+        public const     char             NonBreakingSpace = '\u00A0'; // Non-breaking space to prevent empty search queries
+        private          string           previousText;                // Variable to store the previous text
 
         // Constructor, initializes the search box with position and associated table
         public SearchBox(int x, int y, IFilterableTable table, Scrollbar scrollbar)
@@ -30,29 +30,29 @@ namespace UltimateStorageSystem.Drawing
             this.scrollbar = scrollbar;
 
             // Initializes the textbox with a specific position and size
-            textBox = new TextBox(null, null, Game1.smallFont, Color.Blue)
-            {
-                X = x + 15,  // Offset the search bar 10px to the right
-                Y = y + 13,  // Offset the search bar 15px down
-                Width = 200, // Width of the search bar
-                Height = 40, // Height reduced by 8px (originally 48)
-                Text = nonBreakingSpace.ToString()
-            };
+            TextBox = new TextBox(null, null, Game1.smallFont, Color.Blue)
+                      {
+                          X      = x + 15, // Offset the search bar 10px to the right
+                          Y      = y + 13, // Offset the search bar 15px down
+                          Width  = 200,    // Width of the search bar
+                          Height = 40,     // Height reduced by 8px (originally 48)
+                          Text   = SearchBox.NonBreakingSpace.ToString()
+                      };
 
-            textBox.OnEnterPressed += TextBox_OnEnterPressed;
+            TextBox.OnEnterPressed += TextBox_OnEnterPressed;
             whiteTexture = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
-            whiteTexture.SetData(new[] { Color.White });
+            whiteTexture.SetData([ Color.White ]);
 
             // Set the initial keyboard input focus to the textbox
-            Game1.keyboardDispatcher.Subscriber = textBox;
-            previousText = textBox.Text; // Initialize the previous text
+            Game1.keyboardDispatcher.Subscriber = TextBox;
+            previousText = TextBox.Text; // Initialize the previous text
         }
 
         // Event handler when Enter is pressed in the search box
         private void TextBox_OnEnterPressed(TextBox sender)
         {
             // Updates the filter based on the search text
-            string searchText = sender.Text.TrimStart(nonBreakingSpace);
+            string searchText = sender.Text.TrimStart(SearchBox.NonBreakingSpace);
             table.FilterItems(searchText);
             table.ScrollIndex = 0; // Scrolls the view to the top after the search is applied.
 
@@ -67,34 +67,34 @@ namespace UltimateStorageSystem.Drawing
         public void Draw(SpriteBatch b)
         {
             // Determine the background and border colors based on the activity of the textbox
-            Color backgroundColor = textBox.Selected ? Color.White : Color.LightGray;
-            Color borderColor = textBox.Selected ? Color.Orange : Color.Gray;
+            Color backgroundColor = TextBox.Selected ? Color.White : Color.LightGray;
+            Color borderColor = TextBox.Selected ? Color.Orange : Color.Gray;
 
             // Draw the enlarged background box
-            Rectangle backgroundRect = new Rectangle(textBox.X - 10, textBox.Y - 2, 255, textBox.Height + 4);
+            Rectangle backgroundRect = new Rectangle(TextBox.X - 10, TextBox.Y - 2, 255, TextBox.Height + 4);
             b.Draw(whiteTexture, backgroundRect, backgroundColor);
 
             // Draw the border around the background box
             DrawBorder(b, backgroundRect, 2, borderColor);
 
             // Draw the background of the textbox
-            b.Draw(whiteTexture, new Rectangle(textBox.X, textBox.Y, textBox.Width, textBox.Height), backgroundColor);
+            b.Draw(whiteTexture, new Rectangle(TextBox.X, TextBox.Y, TextBox.Width, TextBox.Height), backgroundColor);
 
             // Draws the text in the textbox
-            Vector2 textSize = Game1.smallFont.MeasureString(textBox.Text);
-            Vector2 textPosition = new Vector2(textBox.X + 6, textBox.Y + ((textBox.Height - textSize.Y + 4) / 2));
-            b.DrawString(Game1.smallFont, textBox.Text, textPosition, Color.Black);
+            Vector2 textSize = Game1.smallFont.MeasureString(TextBox.Text);
+            Vector2 textPosition = new Vector2(TextBox.X + 6, TextBox.Y + ((TextBox.Height - textSize.Y + 4) / 2));
+            b.DrawString(Game1.smallFont, TextBox.Text, textPosition, Color.Black);
 
             // Draws the cursor if the textbox is active
-            if (textBox.Selected && (Game1.ticks % 60) < 30)  // Blinks in a 30-tick interval
+            if (!TextBox.Selected || Game1.ticks % 60 >= 30) // Blinks in a 30-tick interval
+                return;
+
+            float cursorX = textPosition.X + textSize.X;
+            if (string.IsNullOrEmpty(TextBox.Text.TrimStart(SearchBox.NonBreakingSpace)))
             {
-                float cursorX = textPosition.X + textSize.X;
-                if (string.IsNullOrEmpty(textBox.Text.TrimStart(nonBreakingSpace)))
-                {
-                    cursorX = textBox.X + 6; // Draws the cursor at the beginning if no text is present
-                }
-                b.Draw(whiteTexture, new Rectangle((int)cursorX, (int)textPosition.Y, 1, (int)textSize.Y), Color.Blue);
+                cursorX = TextBox.X + 6; // Draws the cursor at the beginning if no text is present
             }
+            b.Draw(whiteTexture, new Rectangle((int)cursorX, (int)textPosition.Y, 1, (int)textSize.Y), Color.Blue);
         }
 
         // Helper method for drawing a border around a rectangle
@@ -117,16 +117,16 @@ namespace UltimateStorageSystem.Drawing
         public void Update()
         {
             // Ensure that the non-breaking space remains at the beginning
-            if (!textBox.Text.StartsWith(nonBreakingSpace.ToString()))
+            if (!TextBox.Text.StartsWith(SearchBox.NonBreakingSpace.ToString()))
             {
-                textBox.Text = nonBreakingSpace + textBox.Text.TrimStart();
+                TextBox.Text = SearchBox.NonBreakingSpace + TextBox.Text.TrimStart();
             }
 
             // Check if the text has changed and update the filter accordingly
-            if (textBox.Text != previousText)
+            if (TextBox.Text != previousText)
             {
-                previousText = textBox.Text;
-                string searchText = textBox.Text.TrimStart(nonBreakingSpace);
+                previousText = TextBox.Text;
+                string searchText = TextBox.Text.TrimStart(SearchBox.NonBreakingSpace);
                 table.FilterItems(searchText);
                 table.ScrollIndex = 0; // Scrolls the view to the top after the search is applied.
 
@@ -137,33 +137,36 @@ namespace UltimateStorageSystem.Drawing
                 table.SortItemsBy(ItemTableRenderer.GetSortedColumn(), ItemTableRenderer.IsSortAscending());
             }
 
-            textBox.Update();
+            TextBox.Update();
         }
 
         // Processes text input and forwards it to the textbox
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("ReSharper",   "UnusedMember.Global")]
         public void RecieveTextInput(char inputChar)
         {
-            textBox.RecieveTextInput(inputChar);
+            TextBox.RecieveTextInput(inputChar);
         }
 
         // Draws the magnifying glass icon next to the search box
+        [SuppressMessage("CodeQuality", "IDE0079"), SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
         public void DrawMagnifyingGlass(SpriteBatch b, Vector2 position)
         {
             // Source of the magnifying glass icon in the cursor sprite sheet
             Rectangle sourceRect = new Rectangle(80, 0, 16, 16); // Example coordinates for the magnifying glass
 
             // Draws the magnifying glass next to the search box
+            // ReSharper disable once ConvertToConstant.Local
             float scale = Game1.pixelZoom * 2 / 3f; // Scaling to two-thirds of the size
             b.Draw(
-                Game1.mouseCursors, // Cursor sprite sheet
-                position,           // Position to draw the magnifying glass
-                sourceRect,         // Source rectangle of the magnifying glass
-                Color.White,        // Color
-                0f,                 // Rotation
-                Vector2.Zero,       // Origin
-                scale,              // Scaling
-                SpriteEffects.None, // Sprite effects
-                0f                  // Layer depth
+            Game1.mouseCursors, // Cursor sprite sheet
+            position,           // Position to draw the magnifying glass
+            sourceRect,         // Source rectangle of the magnifying glass
+            Color.White,        // Color
+            0f,                 // Rotation
+            Vector2.Zero,       // Origin
+            scale,              // Scaling
+            SpriteEffects.None, // Sprite effects
+            0f                  // Layer depth
             );
         }
 
@@ -171,9 +174,9 @@ namespace UltimateStorageSystem.Drawing
         public void Click()
         {
             // Sets focus on the search box
-            Game1.keyboardDispatcher.Subscriber = textBox;
-            textBox.Selected = true;
-            textBox.Text = textBox.Text; // Retain the current text
+            Game1.keyboardDispatcher.Subscriber = TextBox;
+            TextBox.Selected = true;
+            TextBox.Text = TextBox.Text; // Retain the current text
         }
     }
 }

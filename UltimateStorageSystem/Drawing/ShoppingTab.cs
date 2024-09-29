@@ -5,23 +5,35 @@ namespace UltimateStorageSystem.Drawing
 {
     public class ShoppingTab : IClickableMenu
     {
-        private InventoryMenu playerInventoryMenu; // Player inventory menu
-        private int containerWidth = 830; // Width of the main container
-        private int containerHeight = 900; // Height of the main container
-        private int computerMenuHeight; // Height of the computer menu
-        private int inventoryMenuWidth; // Width of the inventory menu
-        private int inventoryMenuHeight = 280; // Fixed height for the bottom frame (inventory area)
+        // ReSharper disable ConvertToConstant.Local
+        /// <summary>Player inventory menu</summary>
+        private readonly InventoryMenu playerInventoryMenu;
+        /// <summary>Width of the main container</summary>
+        private readonly int           containerWidth  = 830;
+        /// <summary>Height of the main container</summary>
+        private readonly int           containerHeight = 900;
+        /// <summary>Height of the computer menu</summary>
+        private readonly int           computerMenuHeight;
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
+        /// <summary>Width of the inventory menu</summary>
+        private readonly int           inventoryMenuWidth;
+        /// <summary>Fixed height for the bottom frame (inventory area)</summary>
+        private readonly int           inventoryMenuHeight = 280;
+        // ReSharper restore ConvertToConstant.Local
 
-        // Constructor for the ShoppingTab
-        public ShoppingTab(int xPositionOnScreen, int yPositionOnScreen)
-            : base(xPositionOnScreen, yPositionOnScreen, 800, 1000)
+        /// <summary>Constructor for the ShoppingTab</summary>
+        /// <param name="xPositionOnScreen"></param>
+        /// <param name="yPositionOnScreen"></param>
+        public ShoppingTab(int xPositionOnScreen, int yPositionOnScreen) : base(xPositionOnScreen, yPositionOnScreen, 800, 1000)
         {
             // Calculate the height of the computer menu.
             computerMenuHeight = containerHeight - inventoryMenuHeight;
 
             // Calculate the width of the inventory menu based on the number of slots per row.
+            // ReSharper disable ConvertToConstant.Local
             int slotsPerRow = 12; // Assumption: 12 slots per row
             int slotSize = 64; // Size of an inventory slot
+            // ReSharper restore ConvertToConstant.Local
             inventoryMenuWidth = slotsPerRow * slotSize;
 
             // Position of the inventory menu.
@@ -30,7 +42,8 @@ namespace UltimateStorageSystem.Drawing
             playerInventoryMenu = new InventoryMenu(inventoryMenuX, inventoryMenuY, true);
         }
 
-        // Draws the content of the ShoppingTab
+        /// <summary>Draws the content of the ShoppingTab</summary>
+        /// <param name="b"></param>
         public override void draw(SpriteBatch b)
         {
             base.draw(b);

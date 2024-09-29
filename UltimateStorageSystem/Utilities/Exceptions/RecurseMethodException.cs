@@ -4,10 +4,10 @@ namespace UltimateStorageSystem.Utilities.Exceptions
 {
     internal class RecurseMethodException : Exception
     {
-        private const string RecursedTooManyStepsTemplate = "Method, {0}, recursed too many times, did {1} recursions passing the threshold of {2}";
-        public        string MethodName;
-        public        int    StepsTaken;
-        public        int    Threshold;
+        private const   string RecursedTooManyStepsTemplate = "Method, {0}, recursed too many times, did {1} recursions passing the threshold of {2}";
+        public readonly string MethodName;
+        public readonly int    StepsTaken;
+        public readonly int    Threshold;
 
         [Obsolete($"Use a method such as \"{nameof(RecurseMethodException)}.{nameof(RecursedTooManySteps)}\"")]
         public RecurseMethodException()
@@ -33,14 +33,14 @@ namespace UltimateStorageSystem.Utilities.Exceptions
             MethodName = "unknown";
         }
 
-        public RecurseMethodException(string internalMethodName, int recurseStep, int recurseThreshold, string? methodName) : base(FormatMessage(internalMethodName, recurseStep, recurseThreshold, methodName))
+        private RecurseMethodException(string internalMethodName, int recurseStep, int recurseThreshold, string? methodName) : base(FormatMessage(internalMethodName, recurseStep, recurseThreshold, methodName))
         {
             StepsTaken = recurseStep;
             Threshold  = recurseThreshold;
             MethodName = methodName ?? "unknown";
         }
 
-        public RecurseMethodException(string internalMethodName, int recurseStep, int recurseThreshold, string? methodName, Exception? innerException) : base(FormatMessage(internalMethodName, recurseStep, recurseThreshold, methodName), innerException)
+        private RecurseMethodException(string internalMethodName, int recurseStep, int recurseThreshold, string? methodName, Exception? innerException) : base(FormatMessage(internalMethodName, recurseStep, recurseThreshold, methodName), innerException)
         {
             StepsTaken = recurseStep;
             Threshold  = recurseThreshold;

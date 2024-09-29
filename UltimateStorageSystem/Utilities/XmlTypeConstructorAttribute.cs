@@ -4,23 +4,23 @@ namespace UltimateStorageSystem.Utilities
 {
     internal class ModXmlTypeConstructorAttribute : XmlTypeAttribute
     {
-        private static  IManifest? manifest;
-        private static  List<Type> typesToRegister = [];
-        internal static Type[]     TypesToRegister => [..typesToRegister];
+        private static          IManifest? _manifest;
+        private static readonly List<Type> typesToRegister = [];
+        internal static         Type[]     TypesToRegister => [..typesToRegister];
 
         public ModXmlTypeConstructorAttribute(Type classType) : base(GetXmlTypeName(classType.Name))
         {
             typesToRegister.Add(classType);
         }
 
-        internal static void Init(IManifest _manifest)
+        internal static void Init(IManifest manifest)
         {
-            manifest = _manifest;
+            _manifest = manifest;
         }
 
         private static string GetXmlTypeName(string? className)
         {
-            if (manifest is null)
+            if (_manifest is null)
             {
                 throw new NullReferenceException("The mod's manifest was not registered to the class ModXmlTypeConstructorAttribute properly.");
             }
@@ -30,7 +30,7 @@ namespace UltimateStorageSystem.Utilities
                 throw new NullReferenceException("The Caller Member Name passed to the construtor was not properly passed.");
             }
 
-            return $"Mod_{manifest.UniqueID.Replace('.', '_')}_{className}";
+            return $"Mod_{_manifest.UniqueID.Replace('.', '_')}_{className}";
         }
     }
 }

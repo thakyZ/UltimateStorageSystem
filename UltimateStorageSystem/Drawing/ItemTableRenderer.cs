@@ -71,7 +71,8 @@ namespace UltimateStorageSystem.Drawing
             Vector2 iconPosition = new Vector2(startX - 20, rowY - 16);
 
             // Specific adjustments for certain item types
-            if (entry.Item is Ring || entry.Item is Boots)
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (entry.Item is Ring or Boots)
             {
                 iconPosition.Y += 10;  // Shift the icon down for rings and boots
                 iconPosition.X += 10; // Shift the icon to the right for rings and boots
@@ -89,7 +90,7 @@ namespace UltimateStorageSystem.Drawing
                 iconPosition.X += 10; // Shift the icon to the right for these items
             }
 
-            else if (entry.Item is StardewValley.Object obj &&
+            else if (entry.Item is Object obj &&
                      int.TryParse(obj.preservedParentSheetIndex.Value, out int preservedIndex) &&  // Convert to int
                      preservedIndex != -1)  // Compare the int value
             {
@@ -105,28 +106,28 @@ namespace UltimateStorageSystem.Drawing
             if (entry.Item is not null)
             {
                 itemColor = entry.Item.Quality switch
-                {
-                    1 =>                          // Silver
-                        new Color(169, 169, 169), // Darker gray
-                    2 =>                          // Gold
-                        Color.Gold,
-                    4 =>                    // Iridium
-                        Color.MediumPurple, // Purple for iridium
-                    _ => itemColor,
-                };
+                            {
+                                1 =>                      // Silver
+                                new Color(169, 169, 169), // Darker gray
+                                2 =>                      // Gold
+                                Color.Gold,
+                                4 =>                // Iridium
+                                Color.MediumPurple, // Purple for iridium
+                                _ => itemColor,
+                            };
             }
 
             // Limit and truncate text in columns if necessary
             string itemName = entry.Name.Length > MaxItemNameLength ? entry.Name[..MaxQtyLength] + "..." : entry.Name;
             string quantityText = entry.Quantity.ToString().Length > MaxQtyLength
-                                      ? entry.Quantity.ToString().PadLeft(MaxQtyLength)[..MaxQtyLength]
-                                      : entry.Quantity.ToString();
+                                  ? entry.Quantity.ToString().PadLeft(MaxQtyLength)[..MaxQtyLength]
+                                  : entry.Quantity.ToString();
             string valueText = entry.SingleValue.ToString().Length > MaxValueLength
-                                   ? entry.SingleValue.ToString().PadLeft(MaxValueLength)[..MaxValueLength]
-                                   : entry.SingleValue.ToString();
+                               ? entry.SingleValue.ToString().PadLeft(MaxValueLength)[..MaxValueLength]
+                               : entry.SingleValue.ToString();
             string totalValueText = entry.TotalValue.ToString().Length > MaxTotalLength
-                                        ? entry.TotalValue.ToString().PadLeft(MaxTotalLength)[..MaxTotalLength]
-                                        : entry.TotalValue.ToString();
+                                    ? entry.TotalValue.ToString().PadLeft(MaxTotalLength)[..MaxTotalLength]
+                                    : entry.TotalValue.ToString();
 
             // Draws the truncated text in the respective columns
             if (isHovered && entry.Name.Length > MaxItemNameLength)
@@ -166,12 +167,21 @@ namespace UltimateStorageSystem.Drawing
             }
         }
 
-        // Draws the column headers with optional icons
-        public static Rectangle DrawHeaderWithIcon(SpriteBatch b, string text, Vector2 position, Color color, bool alignRight, bool? isAscending, int iconOffsetX)
+        /// <summary>Draws the column headers with optional icons</summary>
+        /// <param name="b"></param>
+        /// <param name="text"></param>
+        /// <param name="position"></param>
+        /// <param name="color"></param>
+        /// <param name="alignRight"></param>
+        /// <param name="isAscending"></param>
+        /// <param name="iconOffsetX"></param>
+        /// <returns></returns>
+        private static Rectangle DrawHeaderWithIcon(SpriteBatch b, string text, Vector2 position, Color color, bool alignRight, bool? isAscending, int iconOffsetX)
         {
             Vector2 textSize = Game1.smallFont.MeasureString(text);
             DrawText(b, text, position, color, alignRight);
 
+            // ReSharper disable once ConvertToConstant.Local
             float scale = 0.5f;
             int clickableWidth = (int)(textSize.X + 10);
 

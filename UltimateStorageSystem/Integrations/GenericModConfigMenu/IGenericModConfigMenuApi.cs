@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Utilities;
 
+#region Api File
 namespace GenericModConfigMenu
 {
     /// <summary>
@@ -193,4 +194,4 @@ namespace GenericModConfigMenu
         void Unregister(IManifest mod);
     }
 }
-
+#endregion
